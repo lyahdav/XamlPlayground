@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.system.h>
 #include <winrt/windows.ui.xaml.hosting.h>
 #include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
@@ -14,8 +15,10 @@ using namespace winrt;
 using namespace Windows::UI;
 using namespace Windows::UI::Composition;
 using namespace Windows::UI::Xaml::Hosting;
+using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
 using namespace Windows::Foundation::Numerics;
+using namespace Windows::Foundation;
 
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -91,7 +94,12 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	// Create the XAML content.
 	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
-	xamlContainer.Background(Windows::UI::Xaml::Media::SolidColorBrush{ Windows::UI::Colors::LightGray() });
+
+	bool useDark = true;
+	if (useDark) {
+		xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
+		xamlContainer.Background(Windows::UI::Xaml::Media::SolidColorBrush{ Windows::UI::Colors::Black() });
+	}
 
 	Windows::UI::Xaml::Controls::TextBlock tb;
 	tb.Text(L"Hello World from Xaml Islands!");
@@ -103,14 +111,39 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	Windows::UI::Xaml::Controls::Flyout f2;
 	Windows::UI::Xaml::Controls::Button b;
 	Windows::UI::Xaml::Controls::Button b2;
+	Windows::UI::Xaml::Controls::MenuFlyout menu;
+	Windows::UI::Xaml::Controls::MenuFlyoutItem menuItem;
+	//Windows::UI::Xaml::Controls::ToolTip t;
+
+	menuItem.Text(L"Hi");
+	auto icon = Windows::UI::Xaml::Controls::BitmapIcon();
+	//Uri uri{ winrt::to_hstring(L"ms-appx:///settings.png") };
+	Uri uri{ winrt::to_hstring(L"https://cdn1.iconfinder.com/data/icons/office-and-business-14/48/64-512.png") };
+	//Uri uri{ winrt::to_hstring(L"http://localhost:8081/assets/src/assets/settings.png?platform=windows&hash=e48f2c19ce9e66f9853e7228ada0ceb8") };
+	icon.UriSource(uri);
+	menuItem.Icon(icon);
+	menu.Items().Append(menuItem);
+
 
 	//f.XamlRoot(xamlContainer.XamlRoot()); // This doesn't seem to make a difference
 	f.ShouldConstrainToRootBounds(false);
 	f2.ShouldConstrainToRootBounds(true); // This doesn't seem to make a difference
 	b.Content(winrt::box_value(L"Hi"));
 	b.Click([=](auto, auto) {
-		f.ShowAt(b);
-	});
+		if (auto xamlRoot = b.XamlRoot()) {
+			menu.XamlRoot(xamlRoot);
+		}
+
+		menu.ShowAt(b);
+
+		//auto x = xamlContainer.XamlRoot();
+		//t.XamlRoot(x);
+		//t.RequestedTheme(b.ActualTheme());
+		});
+	//std::wstring s2 = winrt::to_hstring(s);
+	//t.Content(winrt::to_hstring(L"hi"));
+	//ToolTipService::SetToolTip(b, winrt::box_value(L"Tooltip"));
+	//ToolTipService::SetToolTip(b, t);
 
 	b2.Content(winrt::box_value(L"Hi"));
 	b2.Click([=](auto, auto) {
@@ -125,6 +158,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	xamlContainer.Children().Append(b);
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
+	
 
 	// End XAML Island section.
 
