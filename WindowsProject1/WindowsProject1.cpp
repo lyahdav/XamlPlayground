@@ -111,30 +111,11 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	// Create the XAML content.
 	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
 
-	bool useDark = true;
-	if (useDark) {
-		xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
-		xamlContainer.Background(Windows::UI::Xaml::Media::SolidColorBrush{ Windows::UI::Colors::Black() });
-	}
-
-	Windows::UI::Xaml::Controls::TextBlock tb;
-	tb.Text(L"Hello World from Xaml Islands!");
-	tb.VerticalAlignment(Windows::UI::Xaml::VerticalAlignment::Center);
-	tb.HorizontalAlignment(Windows::UI::Xaml::HorizontalAlignment::Center);
-	tb.FontSize(48);
-
-	//Windows::UI::Xaml::Controls::ToolTip t;
-
 	Flyout f;
-	Flyout f2;
 	Button b;
 	Button b2;
 	Button ib1;
 	Button ib2;
-	MenuFlyout menu;
-	MenuFlyoutItem menuItem;
-	ContentDialog dialog;
-	TextBox textBox;
 	StackPanel panel;
 	StackPanel innerPanel;
 	panel.Margin({ 10.0f, 10.0f, 10.0f, 10.0f });
@@ -143,86 +124,16 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	ComboBoxItem cbi1;
 	ComboBoxItem cbi2;
 
-	//cb.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
 	cbi1.Content(winrt::box_value(L"Item 1"));
 	cbi2.Content(winrt::box_value(L"Item 2"));
-	//cbi1.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
-	//cbi2.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
 	cb.Items().Append(cbi1);
 	cb.Items().Append(cbi2);
-	//cbi1.Parent().as<FrameworkElement>().RequestedTheme(ElementTheme::Dark);
 
-	cbi1.Loaded([=](auto, auto) {
-		auto popups = VisualTreeHelper::GetOpenPopupsForXamlRoot(cb.XamlRoot());
-		for (auto const& popup : popups)
-		{
-			//popup.RequestedTheme(cb.ActualTheme());
-			popup.Child().as<FrameworkElement>().RequestedTheme(cb.ActualTheme());
-		}
-
-		//FrameworkElement parent = cbi1;
-		//while (parent = parent.Parent().as<FrameworkElement>()) {
-		//	parent.RequestedTheme(ElementTheme::Dark);
-		//}
-
-	});
-	cb.DropDownOpened([=](auto, auto) {
-		auto popups = VisualTreeHelper::GetOpenPopups(Window::Current());
-		auto size = popups.Size();
-
-		cout << size;
-
-		auto popups2 = VisualTreeHelper::GetOpenPopupsForXamlRoot(cb.XamlRoot());
-		auto size2 = popups2.Size();
-		cout << size2;
-
-		auto hasParent = cbi1.Parent() != nullptr;
-		cout << hasParent;
-		});
-	// doesn't help, makes it uglier
-	//cbi1.Background(Windows::UI::Xaml::Media::SolidColorBrush(Windows::UI::Colors::Black()));
-	//cbi2.Background(Windows::UI::Xaml::Media::SolidColorBrush(Windows::UI::Colors::Black()));
-
-	dialog.Title(winrt::box_value(L"Title"));
-	dialog.PrimaryButtonText(L"OK");
-
-	menuItem.Text(L"Hi");
-	auto icon = Windows::UI::Xaml::Controls::BitmapIcon();
-	icon.Foreground(Windows::UI::Xaml::Media::SolidColorBrush(Windows::UI::Colors::White()));
-	//Uri uri{ winrt::to_hstring(L"ms-appx:///settings.png") };
-	Uri uri{ winrt::to_hstring(L"https://cdn1.iconfinder.com/data/icons/office-and-business-14/48/64-512.png") };
-	//Uri uri{ winrt::to_hstring(L"http://localhost:8081/assets/src/assets/settings.png?platform=windows&hash=e48f2c19ce9e66f9853e7228ada0ceb8") };
-	icon.UriSource(uri);
-	menuItem.Icon(icon);
-	menu.ShouldConstrainToRootBounds(true);
-	menu.Items().Append(menuItem);
-
-	//f.XamlRoot(xamlContainer.XamlRoot()); // This doesn't seem to make a difference
 	f.ShouldConstrainToRootBounds(true);
-	f2.ShouldConstrainToRootBounds(true); // This doesn't seem to make a difference
 	b.Content(winrt::box_value(L"Hi"));
 	b.Click([=](auto, auto) {
-		//cbi1.XamlRoot(xamlContainer.XamlRoot());
-		//cbi2.XamlRoot(xamlContainer.XamlRoot());
-
-		//if (auto xamlRoot = b.XamlRoot()) {
-		//	menu.XamlRoot(xamlRoot);
-		//	dialog.XamlRoot(xamlRoot);
-		//}
-		//f.Placement(FlyoutPlacementMode::Full);
 		f.ShowAt(b);
-
-
-		//menu.ShowAt(b);
-
-		//auto x = xamlContainer.XamlRoot();
-		//t.XamlRoot(x);
-		//t.RequestedTheme(b.ActualTheme());
 		});
-	//std::wstring s2 = winrt::to_hstring(s);
-	//t.Content(winrt::to_hstring(L"hi"));
-	//ToolTipService::SetToolTip(b, winrt::box_value(L"Tooltip"));
-	//ToolTipService::SetToolTip(b, t);
 
 	b2.Content(winrt::box_value(L"Try Focus"));
 	ib1.Content(winrt::box_value(L"Button 1"));
@@ -239,24 +150,15 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 		auto nextElement = winrt::FocusManager::FindNextElement(winrt::FocusNavigationDirection::Up, findNextElementOptions);
 		winrt::FocusManager::TryFocusAsync(nextElement, winrt::FocusState::Programmatic);
-
-		//dialog.ShowAsync();
-		//f2.Target(b2);// XamlRoot(b2.XamlRoot());
-		//FlyoutShowOptions options;
-		//options.ShowMode(FlyoutShowMode::Transient);
-		//f2.ShowAt(b2/*, options*/);
 		});
 	f.Content(panel);
-	//panel.Children().Append(textBox);
 	panel.Children().Append(b2);
 	panel.Children().Append(cb);
 	panel.Children().Append(innerPanel);
 	innerPanel.Children().Append(ib1);
 	innerPanel.Children().Append(ib2);
 
-	xamlContainer.Children().Append(tb);
 	xamlContainer.Children().Append(b);
-	//xamlContainer.Children().Append(cb);
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
 
