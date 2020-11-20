@@ -140,23 +140,23 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	ib2.Content(winrt::box_value(L"Button 2"));
 	b2.Click([=](auto, auto) {
 		winrt::FindNextElementOptions findNextElementOptions = winrt::FindNextElementOptions();
-		findNextElementOptions.SearchRoot(xamlContainer);
+		findNextElementOptions.SearchRoot(panel);
 
 		winrt::Point anchorTopLeft = winrt::Point(0, 0);
-		winrt::GeneralTransform transform = innerPanel.TransformToVisual(xamlContainer);
+		winrt::GeneralTransform transform = innerPanel.TransformToVisual(panel);
 		winrt::Point anchorTopLeftConverted = transform.TransformPoint(anchorTopLeft);
 		auto exclusionRect = winrt::Rect(anchorTopLeftConverted.X, anchorTopLeftConverted.Y, innerPanel.Width(), innerPanel.Height());
 		findNextElementOptions.ExclusionRect(exclusionRect);
 
-		auto nextElement = winrt::FocusManager::FindNextElement(winrt::FocusNavigationDirection::Up, findNextElementOptions);
+		auto nextElement = winrt::FocusManager::FindNextElement(winrt::FocusNavigationDirection::Down, findNextElementOptions);
 		winrt::FocusManager::TryFocusAsync(nextElement, winrt::FocusState::Programmatic);
 		});
 	f.Content(panel);
 	panel.Children().Append(b2);
-	panel.Children().Append(cb);
 	panel.Children().Append(innerPanel);
 	innerPanel.Children().Append(ib1);
 	innerPanel.Children().Append(ib2);
+	panel.Children().Append(cb);
 
 	xamlContainer.Children().Append(b);
 	xamlContainer.UpdateLayout();
