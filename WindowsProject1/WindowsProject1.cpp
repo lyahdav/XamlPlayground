@@ -275,8 +275,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	desktopSource.Content(xamlContainer);
 
 	// For dark mode:
-	xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
-	xamlContainer.Background(winrt::Media::SolidColorBrush(winrt::Colors::Black()));
+	//xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
+	//xamlContainer.Background(winrt::Media::SolidColorBrush(winrt::Colors::Black()));
 
 	auto takeFocusRevoker = desktopSource.TakeFocusRequested(winrt::auto_revoke,
 		[=](auto, auto& args) {
