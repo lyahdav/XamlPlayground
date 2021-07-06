@@ -272,7 +272,46 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	xamlContainer.Children().Append(tb1);
 	xamlContainer.Children().Append(tb2);
 	xamlContainer.UpdateLayout();
-	desktopSource.Content(xamlContainer);
+	
+	StackPanel stackPanel;
+	StackPanel stackPanelLight;
+	StackPanel stackPanelDark;
+
+	stackPanelDark.RequestedTheme(ElementTheme::Dark);
+	stackPanelDark.Background(SolidColorBrush(Windows::UI::Colors::Black()));
+
+	CommandBarFlyout cbf;
+	cbf.Opening([=](winrt::IInspectable const& sender, const auto&) {
+		if (auto cmdBarFlyout = sender.try_as<winrt::CommandBarFlyout>()) {
+			cmdBarFlyout.SecondaryCommands().GetAt(0).as<winrt::AppBarButton>().RequestedTheme(cmdBarFlyout.Target().ActualTheme()); // Islands bug workaround
+		}
+		});
+	AppBarButton abb;
+	abb.Label(L"Button");
+	BitmapIcon icon;
+	//std::wstring uriFile{ L"file:///app-facebook.png" };
+	std::wstring uriFile{ L"ms-appx:///app-facebook.png" };
+	Windows::Foundation::Uri uri{ uriFile };
+	icon.UriSource(uri);
+	abb.Icon(icon);
+
+	cbf.SecondaryCommands().Append(abb);
+
+	Button button1;
+	button1.Content(winrt::box_value(L"Button1"));
+	button1.Flyout(cbf);
+	stackPanelLight.Children().Append(button1);
+
+	Button button2;
+	button2.Content(winrt::box_value(L"Button2"));
+	button2.Flyout(cbf);
+	stackPanelDark.Children().Append(button2);
+
+	stackPanel.Children().Append(stackPanelLight);
+	stackPanel.Children().Append(stackPanelDark);
+
+	desktopSource.Content(stackPanel);
+
 
 	// For dark mode:
 	//xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
