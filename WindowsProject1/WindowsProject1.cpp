@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
+#include <sstream>
 
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Foundation.h>
@@ -134,209 +135,37 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	SetWindowPos(hWndXamlIsland, 0, 200, 100, 800, 200, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
-	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
+	Windows::UI::Xaml::Controls::StackPanel stackPanel;
 
-	Flyout f;
-	Button b;
-	Button b2;
-	Button ib1;
-	Button ib2;
-	TextBox tb;
-	StackPanel panel;
-	StackPanel innerPanel;
-	panel.Margin({ 10.0f, 10.0f, 10.0f, 10.0f });
 
-	ComboBox cb;
-	ComboBoxItem cbi1;
-	ComboBoxItem cbi2;
+	auto makeButtonWithFlyout = [](bool shouldConstrainToRootBounds, bool useClickEvent) {
+		Button button;
+		std::wostringstream wostringstream;
+		wostringstream << L"Open Flyout (shouldConstrainToRootBounds=" << shouldConstrainToRootBounds << L",useClickEvent=" << useClickEvent << L")";
+		button.Content(winrt::box_value(wostringstream.str()));
 
-	TextBlock tb1;
-	TextBlock tb2;
-
-	tb1.Text(winrt::to_hstring("Hi1"));
-	tb1.IsTextSelectionEnabled(true);
-	tb2.IsTextSelectionEnabled(true);
-	tb2.Text(winrt::to_hstring("Hi2"));
-
-	cbi1.Content(winrt::box_value(L"Item 1"));
-	cbi2.Content(winrt::box_value(L"Item 2"));
-	cb.Items().Append(cbi1);
-	cb.Items().Append(cbi2);
-
-	f.ShouldConstrainToRootBounds(true);
-	b.Content(winrt::box_value(L"CommandBarFlyout"));
-	b.Click([=](auto, auto) {
-		winrt::CommandBarFlyout cbf;
-
-		winrt::AppBarButton cbe;
-		cbe.RequestedTheme(xamlContainer.XamlRoot().Content().as<winrt::FrameworkElement>().ActualTheme());
-		cbe.Label(L"Button 1");
-		cbf.SecondaryCommands().Append(cbe);
-
-		winrt::AppBarButton cbe2;
-		cbe2.RequestedTheme(xamlContainer.XamlRoot().Content().as<winrt::FrameworkElement>().ActualTheme());
-		cbe2.Label(L"Button 2");
-		cbf.SecondaryCommands().Append(cbe2);
-
-		cbf.ShowAt(b);
-		// crashes because content null
-		//auto win = winrt::Window::Current();
-		//auto content = win.Content().as<winrt::FrameworkElement>();
-		//content.AccessKey();
-
-		//auto content = b.XamlRoot().Content().as<winrt::FrameworkElement>();
-		//content.AccessKey();
-		//f.ShowAt(b);
-
-		});
-
-	b2.Content(winrt::box_value(L"Try Focus"));
-	ib1.Content(winrt::box_value(L"Change to light theme"));
-	ib1.Click([=](auto, auto) {
-		xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Light);
-		xamlContainer.Background(nullptr);
-
-		});
-
-	ib2.Content(winrt::box_value(L"Button 2"));
-	b2.Click([=](auto, auto) {
-		auto xamlRoot = innerPanel.XamlRoot();
-		winrt::FindNextElementOptions findNextElementOptions = winrt::FindNextElementOptions();
-		findNextElementOptions.SearchRoot(xamlRoot.Content());
-
-		winrt::Point anchorTopLeft = winrt::Point(0, 0);
-		winrt::GeneralTransform transform = innerPanel.TransformToVisual(xamlRoot.Content());
-		winrt::Point anchorTopLeftConverted = transform.TransformPoint(anchorTopLeft);
-		auto exclusionRect = winrt::Rect(anchorTopLeftConverted.X, anchorTopLeftConverted.Y, innerPanel.ActualWidth(), innerPanel.ActualHeight());
-		findNextElementOptions.ExclusionRect(exclusionRect);
-
-		auto nextElement = winrt::FocusManager::FindNextElement(winrt::FocusNavigationDirection::Up, findNextElementOptions);
-		winrt::FocusManager::TryFocusAsync(nextElement, winrt::FocusState::Programmatic);
-		});
-	//f.Content(panel);
-	//panel.KeyDown([=](const winrt::IInspectable& sender, const winrt::KeyRoutedEventArgs& e) {
-	//	if (e.Key() == winrt::Windows::System::VirtualKey::Tab) {
-	//		winrt::FocusManager::TryMoveFocusAsync(winrt::FocusNavigationDirection::Next);
-	//		/*if (result) {
-	//			OutputDebugString(_T("True result.\n"));
-	//		}
-	//		else {
-	//			OutputDebugString(_T("False result.\n"));
-
-	//		}*/
-	//		e.Handled(true);
-	//	}
-	//	});
-
-	//panel.Children().Append(innerPanel);
-	//innerPanel.Children().Append(b2);
-	//panel.Children().Append(cb);
-
-	ScrollViewer sv;
-
-	panel.Children().Append(sv);
-	StackPanel svPanel;
-	sv.Content(svPanel);
-	svPanel.XYFocusKeyboardNavigation(winrt::XYFocusKeyboardNavigationMode::Enabled);
-	svPanel.TabFocusNavigation(winrt::KeyboardNavigationMode::Once);
-	svPanel.KeyDown([=](const winrt::IInspectable& sender, const winrt::KeyRoutedEventArgs& e) {
-		auto coreWindow = winrt::CoreWindow::GetForCurrentThread();
-
-		auto isShiftDown = (coreWindow.GetKeyState(winrt::Windows::System::VirtualKey::Shift) & winrt::CoreVirtualKeyStates::Down) == winrt::CoreVirtualKeyStates::Down;
-		if (e.Key() == winrt::Windows::System::VirtualKey::Tab && isShiftDown) {
-			winrt::FindNextElementOptions findNextElementOptions = winrt::FindNextElementOptions();
-			findNextElementOptions.SearchRoot(xamlContainer);
-
-			winrt::DependencyObject focusedElement = nullptr;
-			do {
-				auto result = winrt::FocusManager::TryMoveFocus(winrt::FocusNavigationDirection::Previous, findNextElementOptions);
-				focusedElement = winrt::FocusManager::GetFocusedElement(xamlContainer.XamlRoot()).try_as<winrt::DependencyObject>();
-			} while (IsElementChildOf(focusedElement, svPanel));
-			e.Handled(true);
+		StackPanel sp2;
+		Button b2;
+		b2.Content(winrt::box_value(L"b2"));
+		sp2.Children().Append(b2);
+		Flyout flyout;
+		flyout.ShouldConstrainToRootBounds(shouldConstrainToRootBounds);
+		flyout.Content(sp2);
+		if (useClickEvent) {
+			button.Click([=](auto const &...) {
+				flyout.ShowAt(button);
+				});
 		}
-		});
-	StackPanel bp1;
-	//bp1.TabFocusNavigation(winrt::KeyboardNavigationMode::Once);
-	bp1.Children().Append(ib1);
-	StackPanel bp2;
-	//bp2.TabFocusNavigation(winrt::KeyboardNavigationMode::Once);
-	bp2.Children().Append(ib2);
-
-	svPanel.Children().Append(bp1);
-	svPanel.Children().Append(bp2);
-
-	xamlContainer.Children().Append(tb);
-	xamlContainer.Children().Append(b);
-	xamlContainer.Children().Append(panel);
-	xamlContainer.Children().Append(b2);
-	xamlContainer.Children().Append(tb1);
-	xamlContainer.Children().Append(tb2);
-	xamlContainer.UpdateLayout();
-	
-	////////////////////
-
-	StackPanel stackPanel;
-	StackPanel stackPanelLight;
-	StackPanel stackPanelDark;
-
-	stackPanelDark.RequestedTheme(ElementTheme::Dark);
-	stackPanelDark.Background(SolidColorBrush(Windows::UI::Colors::Black()));
-
-	CommandBarFlyout cbf;
-	cbf.Opening([=](winrt::IInspectable const& sender, const auto&) {
-		if (auto cmdBarFlyout = sender.try_as<winrt::CommandBarFlyout>()) {
-			cmdBarFlyout.SecondaryCommands().GetAt(0).as<winrt::AppBarButton>().RequestedTheme(cmdBarFlyout.Target().ActualTheme()); // Islands bug workaround
+		else {
+			button.Flyout(flyout);
 		}
-		});
-	AppBarButton abb;
-	abb.Label(L"Button");
-	BitmapIcon icon;
-	std::wstring uriFile{ L"ms-appx:///app-facebook.png" };
-	Windows::Foundation::Uri uri{ uriFile };
-	icon.UriSource(uri);
-	abb.Icon(icon);
-
-	cbf.SecondaryCommands().Append(abb);
-
-	Button button1;
-	button1.Content(winrt::box_value(L"CommandBarFlyout"));
-	button1.Flyout(cbf);
-	stackPanelLight.Children().Append(button1);
-
-	Button button2;
-	button2.Content(winrt::box_value(L"CommandBarFlyout"));
-	button2.Flyout(cbf);
-	stackPanelDark.Children().Append(button2);
-
-	MenuFlyout mf;
-	MenuFlyoutItem mfi;
-	mfi.Text(L"Menu Item with workaround");
-	BitmapIcon icon1;
-	icon1.UriSource(uri);
-	mfi.Icon(icon1);
-	mfi.PointerExited([=](const auto &...) {
-		auto bitmapIcon = mfi.Icon().as<BitmapIcon>();
-		bitmapIcon.UriSource(bitmapIcon.UriSource());
-		});
-
-	mf.Items().Append(mfi);
-
-	MenuFlyoutItem mfi2;
-	mfi2.Text(L"Menu Item without workaround");
-
-	BitmapIcon icon2;
-	icon2.UriSource(uri);
-
-	mfi2.Icon(icon2);
-	mf.Items().Append(mfi2);
-
-	Button button3;
-	button3.Content(winrt::box_value(L"MenuFlyout"));
-	button3.Flyout(mf);
-	stackPanelDark.Children().Append(button3);
-
-	stackPanel.Children().Append(stackPanelLight);
-	stackPanel.Children().Append(stackPanelDark);
+		return button;
+	};
+	for (auto shouldConstrainToRootBounds : { false, true }) {
+		for (auto useClickEvent : { false, true }) {
+			stackPanel.Children().Append(makeButtonWithFlyout(shouldConstrainToRootBounds, useClickEvent));
+		}
+	}
 
 	desktopSource.Content(stackPanel);
 
