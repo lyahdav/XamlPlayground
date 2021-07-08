@@ -273,6 +273,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	xamlContainer.Children().Append(tb2);
 	xamlContainer.UpdateLayout();
 	
+	////////////////////
+
 	StackPanel stackPanel;
 	StackPanel stackPanelLight;
 	StackPanel stackPanelDark;
@@ -289,7 +291,6 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	AppBarButton abb;
 	abb.Label(L"Button");
 	BitmapIcon icon;
-	//std::wstring uriFile{ L"file:///app-facebook.png" };
 	std::wstring uriFile{ L"ms-appx:///app-facebook.png" };
 	Windows::Foundation::Uri uri{ uriFile };
 	icon.UriSource(uri);
@@ -298,20 +299,49 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	cbf.SecondaryCommands().Append(abb);
 
 	Button button1;
-	button1.Content(winrt::box_value(L"Button1"));
+	button1.Content(winrt::box_value(L"CommandBarFlyout"));
 	button1.Flyout(cbf);
 	stackPanelLight.Children().Append(button1);
 
 	Button button2;
-	button2.Content(winrt::box_value(L"Button2"));
+	button2.Content(winrt::box_value(L"CommandBarFlyout"));
 	button2.Flyout(cbf);
 	stackPanelDark.Children().Append(button2);
+
+	MenuFlyout mf;
+	MenuFlyoutItem mfi;
+	mfi.Text(L"Menu Item with workaround");
+	BitmapIcon icon1;
+	icon1.UriSource(uri);
+	mfi.Icon(icon1);
+	mfi.PointerExited([=](const auto &...) {
+		auto bitmapIcon = mfi.Icon().as<BitmapIcon>();
+		bitmapIcon.UriSource(bitmapIcon.UriSource());
+		});
+
+	mf.Items().Append(mfi);
+
+	MenuFlyoutItem mfi2;
+	mfi2.Text(L"Menu Item without workaround");
+
+	BitmapIcon icon2;
+	icon2.UriSource(uri);
+
+	mfi2.Icon(icon2);
+	mf.Items().Append(mfi2);
+
+	Button button3;
+	button3.Content(winrt::box_value(L"MenuFlyout"));
+	button3.Flyout(mf);
+	stackPanelDark.Children().Append(button3);
 
 	stackPanel.Children().Append(stackPanelLight);
 	stackPanel.Children().Append(stackPanelDark);
 
 	desktopSource.Content(stackPanel);
 
+	/////////
+	
 
 	// For dark mode:
 	//xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
