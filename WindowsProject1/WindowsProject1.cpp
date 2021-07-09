@@ -137,44 +137,29 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	// Create the XAML content.
 	Windows::UI::Xaml::Controls::StackPanel stackPanel;
 
-
-	auto makeButtonWithFlyout = [](bool shouldConstrainToRootBounds, bool useClickEvent) {
+	auto makeButtonWithContentDialog = []() {
 		Button button;
 		std::wostringstream wostringstream;
-		wostringstream << L"Open Flyout (shouldConstrainToRootBounds=" << shouldConstrainToRootBounds << L",useClickEvent=" << useClickEvent << L")";
+		wostringstream << L"Open ContentDialog";
 		button.Content(winrt::box_value(wostringstream.str()));
 
-		StackPanel sp2;
-		Button b2;
-		b2.Content(winrt::box_value(L"b2"));
-		sp2.Children().Append(b2);
-		Flyout flyout;
-		flyout.ShouldConstrainToRootBounds(shouldConstrainToRootBounds);
-		flyout.Content(sp2);
-		if (useClickEvent) {
-			button.Click([=](auto const &...) {
-				flyout.ShowAt(button);
-				});
-		}
-		else {
-			button.Flyout(flyout);
-		}
+		button.Click([=](auto const &...) {
+			ContentDialog dialog{};
+			dialog.Title(winrt::box_value(L"Title"));
+			dialog.Content(winrt::box_value(L"Content"));
+			dialog.XamlRoot(button.XamlRoot());
+			dialog.CloseButtonText(L"Ok");
+			dialog.ShowAsync();
+			});
 		return button;
 	};
-	for (auto shouldConstrainToRootBounds : { false, true }) {
-		for (auto useClickEvent : { false, true }) {
-			stackPanel.Children().Append(makeButtonWithFlyout(shouldConstrainToRootBounds, useClickEvent));
-		}
-	}
+	stackPanel.Children().Append(makeButtonWithContentDialog());
 
 	desktopSource.Content(stackPanel);
 
-	/////////
-	
-
 	// For dark mode:
-	//xamlContainer.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
-	//xamlContainer.Background(winrt::Media::SolidColorBrush(winrt::Colors::Black()));
+	stackPanel.RequestedTheme(Windows::UI::Xaml::ElementTheme::Dark);
+	stackPanel.Background(winrt::Media::SolidColorBrush(winrt::Colors::Black()));
 
 	auto takeFocusRevoker = desktopSource.TakeFocusRequested(winrt::auto_revoke,
 		[=](auto, auto& args) {
