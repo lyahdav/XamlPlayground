@@ -117,8 +117,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	menuItem.Text(L"Hi");
 	auto icon = Windows::UI::Xaml::Controls::BitmapIcon();
-	//Uri uri{ winrt::to_hstring(L"ms-appx:///settings.png") };
-	Uri uri{ winrt::to_hstring(L"https://cdn1.iconfinder.com/data/icons/office-and-business-14/48/64-512.png") };
+	Uri uri{ winrt::to_hstring(L"ms-appx:///pip-layout.png") };
+	//Uri uri{ winrt::to_hstring(L"https://cdn1.iconfinder.com/data/icons/office-and-business-14/48/64-512.png") };
 	//Uri uri{ winrt::to_hstring(L"http://localhost:8081/assets/src/assets/settings.png?platform=windows&hash=e48f2c19ce9e66f9853e7228ada0ceb8") };
 	icon.UriSource(uri);
 	menuItem.Icon(icon);

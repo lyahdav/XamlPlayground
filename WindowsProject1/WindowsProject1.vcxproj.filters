@@ -45,7 +45,7 @@
     <Image Include="WindowsProject1.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\..\..\..\..\..\open\fbsource\xplat\archon\packages\rn\src\assets\settings.png">
+    <Image Include="pip-layout.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
