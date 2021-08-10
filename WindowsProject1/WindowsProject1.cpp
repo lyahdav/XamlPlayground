@@ -91,38 +91,9 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	// Create the XAML content.
 	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
-	xamlContainer.Background(Windows::UI::Xaml::Media::SolidColorBrush{ Windows::UI::Colors::LightGray() });
 
-	Windows::UI::Xaml::Controls::TextBlock tb;
-	tb.Text(L"Hello World from Xaml Islands!");
-	tb.VerticalAlignment(Windows::UI::Xaml::VerticalAlignment::Center);
-	tb.HorizontalAlignment(Windows::UI::Xaml::HorizontalAlignment::Center);
-	tb.FontSize(48);
-
-	Windows::UI::Xaml::Controls::Flyout f;
-	Windows::UI::Xaml::Controls::Flyout f2;
-	Windows::UI::Xaml::Controls::Button b;
-	Windows::UI::Xaml::Controls::Button b2;
-
-	//f.XamlRoot(xamlContainer.XamlRoot()); // This doesn't seem to make a difference
-	f.ShouldConstrainToRootBounds(false);
-	f2.ShouldConstrainToRootBounds(true); // This doesn't seem to make a difference
-	b.Content(winrt::box_value(L"Hi"));
-	b.Click([=](auto, auto) {
-		f.ShowAt(b);
-	});
-
-	b2.Content(winrt::box_value(L"Hi"));
-	b2.Click([=](auto, auto) {
-		//f2.Target(b2);// XamlRoot(b2.XamlRoot());
-		//FlyoutShowOptions options;
-		//options.ShowMode(FlyoutShowMode::Transient);
-		f2.ShowAt(b2/*, options*/);
-	});
-	f.Content(b2);
-
+	Windows::UI::Xaml::Controls::TextBox tb;
 	xamlContainer.Children().Append(tb);
-	xamlContainer.Children().Append(b);
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
 
