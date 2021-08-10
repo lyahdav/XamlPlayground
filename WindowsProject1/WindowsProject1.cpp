@@ -125,9 +125,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT messageCode, WPARAM wParam, LPARAM l
 	case WM_PAINT:
 		if (hWnd == _hWnd)
 		{
-			hdc = BeginPaint(hWnd, &ps);
-			TextOut(hdc, 300, 5, greeting, wcslen(greeting));
-			EndPaint(hWnd, &ps);
+			//hdc = BeginPaint(hWnd, &ps);
+			//TextOut(hdc, 300, 5, greeting, wcslen(greeting));
+			//EndPaint(hWnd, &ps);
 		}
 		break;
 	case WM_DESTROY:
