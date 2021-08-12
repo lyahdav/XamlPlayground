@@ -7,6 +7,7 @@
 #include <winrt/windows.ui.xaml.hosting.h>
 #include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
 #include <winrt/windows.ui.xaml.h>
+#include <winrt/windows.ui.xaml.input.h>
 #include <winrt/windows.ui.xaml.controls.h>
 #include <winrt/windows.ui.xaml.controls.primitives.h>
 #include <winrt/Windows.ui.xaml.media.h>
@@ -15,6 +16,8 @@ using namespace winrt;
 using namespace Windows::UI;
 using namespace Windows::UI::Composition;
 using namespace Windows::UI::Xaml;
+using namespace Windows::UI::Xaml::Media;
+using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Hosting;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
@@ -26,18 +29,49 @@ HWND _hWnd;
 HWND _childhWnd;
 HINSTANCE _hInstance;
 
-struct CustomCbf : CommandBarFlyoutT<CustomCbf> {
 
-	Control CreatePresenter()
-	{
-		auto presenter = CommandBarFlyoutT::CreatePresenter().as<FlyoutPresenter>();
-		auto cbfcb = presenter.Content().as<CommandBarFlyoutCommandBar>();
-		cbfcb.Loaded([](auto&&...) {
-			OutputDebugString(L"Loaded\n");
-			});
+Popup GetPopup(XamlRoot xamlRoot) {
+	auto popups =
+		VisualTreeHelper::GetOpenPopupsForXamlRoot(xamlRoot);
+	if (popups.Size() > 0)
+		return popups.GetAt(0);
+	return nullptr;
+}
+
+CommandBarOverflowPresenter FindPresenter(DependencyObject element) {
+	if (element == nullptr) {
+		return nullptr;
+	}
+
+	OutputDebugString(L"get_class_name: ");
+	OutputDebugString(winrt::get_class_name(element).c_str());
+	OutputDebugString(L"\n");
+
+
+	if (auto presenter = element.try_as<CommandBarOverflowPresenter>()) {
 		return presenter;
 	}
-};
+
+	int childrenCount = VisualTreeHelper::GetChildrenCount(element);
+	for (int i = 0; i < childrenCount; i++) {
+		auto result = FindPresenter(VisualTreeHelper::GetChild(element, i));
+		if (result != nullptr)
+			return result;
+	}
+
+	return nullptr;
+}
+
+void HookKeyDownInOverflowPresenter(Popup popup) {
+	auto presenter = FindPresenter(popup.Child());
+	if (!presenter) {
+		return;
+	}
+	presenter.PreviewKeyDown([](auto const&, KeyRoutedEventArgs const& args) {
+		OutputDebugString(L"PreviewKeyDown\n");
+		args.Handled(true);
+		});
+}
 
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -110,8 +144,14 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
 
 	Button btn;
-	auto cbf = winrt::make<CustomCbf>();
+	CommandBarFlyout cbf;
 	AppBarButton btn1;
+	btn1.Loaded([xamlContainer](auto&&...) {
+		OutputDebugString(L"btn1 Loaded\n");
+		if (auto popup = GetPopup(xamlContainer.XamlRoot())) {
+			HookKeyDownInOverflowPresenter(popup);
+		}
+		});
 	btn1.Label(L"btn1");
 	AppBarButton btn2;
 	btn2.Label(L"btn2");
