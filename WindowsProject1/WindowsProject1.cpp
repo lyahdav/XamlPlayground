@@ -27,6 +27,16 @@ HWND _childhWnd;
 HINSTANCE _hInstance;
 
 struct CustomCbf : CommandBarFlyoutT<CustomCbf> {
+
+	Control CreatePresenter()
+	{
+		auto presenter = CommandBarFlyoutT::CreatePresenter().as<FlyoutPresenter>();
+		auto cbfcb = presenter.Content().as<CommandBarFlyoutCommandBar>();
+		cbfcb.Loaded([](auto&&...) {
+			OutputDebugString(L"Loaded\n");
+			});
+		return presenter;
+	}
 };
 
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
