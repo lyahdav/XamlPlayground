@@ -6,6 +6,7 @@
 #include <winrt/Windows.system.h>
 #include <winrt/windows.ui.xaml.hosting.h>
 #include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
+#include <winrt/windows.ui.xaml.h>
 #include <winrt/windows.ui.xaml.controls.h>
 #include <winrt/windows.ui.xaml.controls.primitives.h>
 #include <winrt/Windows.ui.xaml.media.h>
@@ -13,7 +14,9 @@
 using namespace winrt;
 using namespace Windows::UI;
 using namespace Windows::UI::Composition;
+using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Hosting;
+using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
 using namespace Windows::Foundation::Numerics;
 
@@ -22,6 +25,9 @@ LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 HWND _hWnd;
 HWND _childhWnd;
 HINSTANCE _hInstance;
+
+struct CustomCbf : CommandBarFlyoutT<CustomCbf> {
+};
 
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -91,10 +97,23 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	SetWindowPos(hWndXamlIsland, 0, 200, 100, 800, 200, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
-	Windows::UI::Xaml::Controls::Grid xamlContainer;
+	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
 
-	Windows::UI::Xaml::Controls::TextBox tb;
-	xamlContainer.Children().Append(tb);
+	Button btn;
+	auto cbf = winrt::make<CustomCbf>();
+	AppBarButton btn1;
+	btn1.Label(L"btn1");
+	AppBarButton btn2;
+	btn2.Label(L"btn2");
+	AppBarButton btn3;
+	btn3.Label(L"btn3");
+
+	cbf.SecondaryCommands().Append(btn1);
+	cbf.SecondaryCommands().Append(btn2);
+	cbf.SecondaryCommands().Append(btn3);
+	btn.Flyout(cbf);
+
+	xamlContainer.Children().Append(btn);
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
 
