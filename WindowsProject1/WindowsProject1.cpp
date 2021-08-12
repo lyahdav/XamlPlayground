@@ -68,6 +68,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	init_apartment(apartment_type::single_threaded);
 
 	// Initialize the XAML framework's core window for the current thread.
+	// NOTE: must store this in a variable even though it's not used in order to increase reference count until this function returns.
 	WindowsXamlManager winxamlmanager = WindowsXamlManager::InitializeForCurrentThread();
 
 	// This DesktopWindowXamlSource is the object that enables a non-UWP desktop application 
@@ -90,7 +91,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	SetWindowPos(hWndXamlIsland, 0, 200, 100, 800, 200, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
-	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
+	Windows::UI::Xaml::Controls::Grid xamlContainer;
 
 	Windows::UI::Xaml::Controls::TextBox tb;
 	xamlContainer.Children().Append(tb);
@@ -101,6 +102,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	ShowWindow(_hWnd, nCmdShow);
 	UpdateWindow(_hWnd);
+	SetFocus(_hWnd);
 
 	//Message loop:
 	MSG msg = { };
@@ -115,21 +117,10 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT messageCode, WPARAM wParam, LPARAM lParam)
 {
-	PAINTSTRUCT ps;
-	HDC hdc;
-	wchar_t greeting[] = L"Hello World in Win32!";
 	RECT rcClient;
 
 	switch (messageCode)
 	{
-	case WM_PAINT:
-		if (hWnd == _hWnd)
-		{
-			//hdc = BeginPaint(hWnd, &ps);
-			//TextOut(hdc, 300, 5, greeting, wcslen(greeting));
-			//EndPaint(hWnd, &ps);
-		}
-		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
