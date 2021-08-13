@@ -35,7 +35,6 @@ HWND _hWnd;
 HWND _childhWnd;
 HINSTANCE _hInstance;
 
-
 Popup GetPopup(XamlRoot xamlRoot) {
 	auto popups =
 		VisualTreeHelper::GetOpenPopupsForXamlRoot(xamlRoot);
@@ -68,51 +67,12 @@ CommandBarOverflowPresenter FindPresenter(DependencyObject element) {
 	return nullptr;
 }
 
-
-bool IsControlFocusable(
-	winrt::Control const& control,
-	bool checkTabStop)
-{
-	return control &&
-		control.Visibility() == winrt::Visibility::Visible &&
-		(control.IsEnabled() || control.AllowFocusWhenDisabled()) &&
-		(control.IsTabStop() || (!checkTabStop && !control.try_as<winrt::AppBarSeparator>())); // AppBarSeparator is not focusable if IsTabStop is false
-}
-
-bool FocusControl(
-	winrt::Control const& newFocus,
-	winrt::Control const& oldFocus,
-	winrt::FocusState const& focusState,
-	bool updateTabStop)
-{
-	//MUX_ASSERT(newFocus);
-
-	if (updateTabStop)
-	{
-		newFocus.IsTabStop(true);
-	}
-
-	if (newFocus.Focus(focusState))
-	{
-		if (oldFocus && updateTabStop)
-		{
-			oldFocus.IsTabStop(false);
-		}
-		return true;
-	}
-	return false;
-}
-
-static bool didHookKeyDown = false;
-
 void HookKeyDownInOverflowPresenter(Popup popup, CommandBarFlyout cbf) {
 	auto presenter = FindPresenter(popup.Child());
 	if (!presenter) {
 		return;
 	}
 	presenter.PreviewKeyDown([cbf](auto const&, KeyRoutedEventArgs const& args) {
-		OutputDebugString(L"PreviewKeyDown\n");
-
 		switch (args.Key())
 		{
 
@@ -221,6 +181,83 @@ void HookKeyDownInOverflowPresenter(Popup popup, CommandBarFlyout cbf) {
 		});
 }
 
+void OnFirstCommandLoaded(CommandBarFlyout flyout) {
+	if (auto popup = GetPopup(flyout.Target().XamlRoot())) {
+		HookKeyDownInOverflowPresenter(popup, flyout);
+	}
+}
+
+struct CustomCbf : CommandBarFlyoutT<CustomCbf> {
+	CommandBarFlyoutCommandBar m_commandBar;
+	FrameworkElement::Loaded_revoker m_firstItemLoadedRevoker;
+
+	Control CreatePresenter()
+	{
+		auto presenter = CommandBarFlyoutT::CreatePresenter().as<FlyoutPresenter>();
+		m_commandBar = presenter.Content().as<CommandBarFlyoutCommandBar>();
+		m_commandBar.Loaded([this](Windows::Foundation::IInspectable const& sender, auto const&) {
+			auto cb = sender.as<CommandBarFlyoutCommandBar>();
+			auto commands = cb.PrimaryCommands().Size() > 0 ? cb.PrimaryCommands() : (cb.SecondaryCommands().Size() > 0 ? cb.SecondaryCommands() : nullptr);
+
+			if (commands) {
+				const auto firstCommandAsFrameworkElement = commands.GetAt(0).try_as<winrt::FrameworkElement>();
+
+				if (firstCommandAsFrameworkElement) {
+					if (firstCommandAsFrameworkElement.IsLoaded()) {
+						OnFirstCommandLoaded(*this);
+					}
+					else {
+						m_firstItemLoadedRevoker = firstCommandAsFrameworkElement.Loaded(winrt::auto_revoke,
+							{
+									[this, firstCommandAsFrameworkElement](auto const&, auto const&)
+									{
+											OnFirstCommandLoaded(*this);
+											m_firstItemLoadedRevoker.revoke();
+									}
+							});
+					}
+				}
+			}
+		});
+
+		return presenter;
+	}
+};
+
+bool IsControlFocusable(
+	winrt::Control const& control,
+	bool checkTabStop)
+{
+	return control &&
+		control.Visibility() == winrt::Visibility::Visible &&
+		(control.IsEnabled() || control.AllowFocusWhenDisabled()) &&
+		(control.IsTabStop() || (!checkTabStop && !control.try_as<winrt::AppBarSeparator>())); // AppBarSeparator is not focusable if IsTabStop is false
+}
+
+bool FocusControl(
+	winrt::Control const& newFocus,
+	winrt::Control const& oldFocus,
+	winrt::FocusState const& focusState,
+	bool updateTabStop)
+{
+	//MUX_ASSERT(newFocus);
+
+	if (updateTabStop)
+	{
+		newFocus.IsTabStop(true);
+	}
+
+	if (newFocus.Focus(focusState))
+	{
+		if (oldFocus && updateTabStop)
+		{
+			oldFocus.IsTabStop(false);
+		}
+		return true;
+	}
+	return false;
+}
+
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 	_hInstance = hInstance;
@@ -294,14 +331,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	Button btn;
 	btn.Content(box_value(L"Open Flyout"));
 	btn.Click([=](auto&&...) {
-		CommandBarFlyout cbf;
+		auto cbf = winrt::make<CustomCbf>();
 		AppBarButton btn1;
-		btn1.Loaded([xamlContainer, btn1, cbf](auto&&...) {
-			OutputDebugString(L"btn1 Loaded\n");
-			if (auto popup = GetPopup(xamlContainer.XamlRoot())) {
-				HookKeyDownInOverflowPresenter(popup, cbf);
-			}
-			});
 		btn1.Label(L"btn1");
 
 		cbf.SecondaryCommands().Append(btn1);
