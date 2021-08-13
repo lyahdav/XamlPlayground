@@ -23,6 +23,12 @@ using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
 using namespace Windows::Foundation::Numerics;
 
+namespace winrt {
+	using namespace Windows::System;
+	using namespace Windows::UI::Xaml;
+	using namespace Windows::UI::Xaml::Controls;
+}
+
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
 HWND _hWnd;
@@ -62,13 +68,155 @@ CommandBarOverflowPresenter FindPresenter(DependencyObject element) {
 	return nullptr;
 }
 
-void HookKeyDownInOverflowPresenter(Popup popup) {
+
+bool IsControlFocusable(
+	winrt::Control const& control,
+	bool checkTabStop)
+{
+	return control &&
+		control.Visibility() == winrt::Visibility::Visible &&
+		(control.IsEnabled() || control.AllowFocusWhenDisabled()) &&
+		(control.IsTabStop() || (!checkTabStop && !control.try_as<winrt::AppBarSeparator>())); // AppBarSeparator is not focusable if IsTabStop is false
+}
+
+bool FocusControl(
+	winrt::Control const& newFocus,
+	winrt::Control const& oldFocus,
+	winrt::FocusState const& focusState,
+	bool updateTabStop)
+{
+	//MUX_ASSERT(newFocus);
+
+	if (updateTabStop)
+	{
+		newFocus.IsTabStop(true);
+	}
+
+	if (newFocus.Focus(focusState))
+	{
+		if (oldFocus && updateTabStop)
+		{
+			oldFocus.IsTabStop(false);
+		}
+		return true;
+	}
+	return false;
+}
+
+static bool didHookKeyDown = false;
+
+void HookKeyDownInOverflowPresenter(Popup popup, CommandBarFlyout cbf) {
 	auto presenter = FindPresenter(popup.Child());
 	if (!presenter) {
 		return;
 	}
-	presenter.PreviewKeyDown([](auto const&, KeyRoutedEventArgs const& args) {
+	presenter.PreviewKeyDown([cbf](auto const&, KeyRoutedEventArgs const& args) {
 		OutputDebugString(L"PreviewKeyDown\n");
+
+		switch (args.Key())
+		{
+
+		case winrt::VirtualKey::Right:
+		case winrt::VirtualKey::Left:
+		case winrt::VirtualKey::Down:
+		case winrt::VirtualKey::Up:
+		{
+			// TODO
+			const bool isRightToLeft = false;// m_primaryItemsRoot&& m_primaryItemsRoot.get().FlowDirection() == winrt::FlowDirection::RightToLeft;
+			const bool isLeft = (args.Key() == winrt::VirtualKey::Left && !isRightToLeft) || (args.Key() == winrt::VirtualKey::Right && isRightToLeft);
+			const bool isRight = (args.Key() == winrt::VirtualKey::Right && !isRightToLeft) || (args.Key() == winrt::VirtualKey::Left && isRightToLeft);
+			const bool isDown = args.Key() == winrt::VirtualKey::Down;
+			const bool isUp = args.Key() == winrt::VirtualKey::Up;
+
+			// To avoid code duplication, we'll use the key directionality to determine
+			// both which control list to use and in which direction to iterate through
+			// it to find the next control to focus.  Then we'll do that iteration
+			// to focus the next control.
+			// TODO: changed
+			CommandBarFlyout tempCbf;
+			auto const& accessibleControls{ isUp || isDown ? cbf.SecondaryCommands() : tempCbf.SecondaryCommands() };
+			// TODO: was: auto const& accessibleControls{ isUp || isDown ? m_verticallyAccessibleControls : m_horizontallyAccessibleControls };
+			int const startIndex = isLeft || isUp ? accessibleControls.Size() - 1 : 0;
+			int const endIndex = isLeft || isUp ? -1 : accessibleControls.Size();
+			int const deltaIndex = isLeft || isUp ? -1 : 1;
+			bool const shouldLoop = isUp || isDown;
+			winrt::Control focusedControl{ nullptr };
+			int focusedControlIndex = -1;
+
+			for (int i = startIndex;
+				// We'll stop looping at the end index unless we're looping,
+				// in which case we want to wrap back around to the start index.
+				(i != endIndex || shouldLoop) ||
+				// If we found a focused control but have looped all the way back around,
+				// then there wasn't another control to focus, so we should quit.
+				(focusedControlIndex > 0 && i == focusedControlIndex);
+				i += deltaIndex)
+			{
+				// If we've reached the end index, that means we want to loop.
+				// We'll wrap around to the start index.
+				if (i == endIndex)
+				{
+					//MUX_ASSERT(shouldLoop);
+
+					if (focusedControl)
+					{
+						i = startIndex;
+					}
+					else
+					{
+						// If no focused control was found after going through the entire list of controls,
+						// then we have nowhere for focus to go.  Let's early-out in that case.
+						break;
+					}
+				}
+
+				auto const& control = accessibleControls.GetAt(i).as<Control>();
+
+				// If we've yet to find the focused control, we'll keep looking for it.
+				// Otherwise, we'll try to focus the next control after it.
+				if (!focusedControl)
+				{
+					if (control.FocusState() != winrt::FocusState::Unfocused)
+					{
+						focusedControl = control;
+						focusedControlIndex = i;
+					}
+				}
+				else if (IsControlFocusable(control, false /*checkTabStop*/))
+				{
+					// If the control we're trying to focus is in the secondary command list,
+					// then we'll make sure that that list is open before trying to focus the control.
+					// TODO: need to get CommandBar to use IsOpen. Can get from CreatePresenter override.
+					//if (auto const& controlAsCommandBarElement = control.try_as<winrt::ICommandBarElement>())
+					//{
+					//	uint32_t index = 0;
+					//	if (cbf.SecondaryCommands().IndexOf(controlAsCommandBarElement, index) && !IsOpen())
+					//	{
+					//		IsOpen(true);
+					//	}
+					//}
+
+					if (FocusControl(
+						accessibleControls.GetAt(i).as<Control>() /*newFocus*/,
+						focusedControl /*oldFocus*/,
+						winrt::FocusState::Keyboard /*focusState*/,
+						true /*updateTabStop*/))
+					{
+						args.Handled(true);
+						break;
+					}
+				}
+			}
+
+			if (!args.Handled())
+			{
+				// Occurs for example with Right key while MoreButton has focus. Stay on that MoreButton.
+				args.Handled(true);
+			}
+			break;
+		}
+		}
+
 		args.Handled(true);
 		});
 }
@@ -144,24 +292,30 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
 
 	Button btn;
-	CommandBarFlyout cbf;
-	AppBarButton btn1;
-	btn1.Loaded([xamlContainer](auto&&...) {
-		OutputDebugString(L"btn1 Loaded\n");
-		if (auto popup = GetPopup(xamlContainer.XamlRoot())) {
-			HookKeyDownInOverflowPresenter(popup);
-		}
-		});
-	btn1.Label(L"btn1");
-	AppBarButton btn2;
-	btn2.Label(L"btn2");
-	AppBarButton btn3;
-	btn3.Label(L"btn3");
+	btn.Content(box_value(L"Open Flyout"));
+	btn.Click([=](auto&&...) {
+		CommandBarFlyout cbf;
+		AppBarButton btn1;
+		btn1.Loaded([xamlContainer, btn1, cbf](auto&&...) {
+			OutputDebugString(L"btn1 Loaded\n");
+			if (auto popup = GetPopup(xamlContainer.XamlRoot())) {
+				HookKeyDownInOverflowPresenter(popup, cbf);
+			}
+			});
+		btn1.Label(L"btn1");
 
-	cbf.SecondaryCommands().Append(btn1);
-	cbf.SecondaryCommands().Append(btn2);
-	cbf.SecondaryCommands().Append(btn3);
-	btn.Flyout(cbf);
+		cbf.SecondaryCommands().Append(btn1);
+
+		auto addNButtonsToCbf = [](CommandBarFlyout cbf, int n) {
+			for (int i = 0; i < n; i++) {
+				AppBarButton btn;
+				btn.Label(L"btn");
+				cbf.SecondaryCommands().Append(btn);
+			}
+		};
+		addNButtonsToCbf(cbf, 3);
+		cbf.ShowAt(btn);
+		});
 
 	xamlContainer.Children().Append(btn);
 	xamlContainer.UpdateLayout();
