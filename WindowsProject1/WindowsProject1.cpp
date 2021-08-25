@@ -103,25 +103,23 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	interop->get_WindowHandle(&hWndXamlIsland);
 
 	// Update the XAML Island window size because initially it is 0,0.
-	SetWindowPos(hWndXamlIsland, 0, 200, 100, 800, 300, SWP_SHOWWINDOW);
+	SetWindowPos(hWndXamlIsland, 0, 0, 0, 1200, 300, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
 	StackPanel xamlContainer;
 
-	TextBox tb1;
-	TextBlock tbl1;
-	tbl1.Text(L"TextBox");
-	xamlContainer.Children().Append(tbl1);
-	xamlContainer.Children().Append(tb1);
+	auto appendTextBoxWithCbf = [=](auto label, auto cbf) {
+		TextBox tb;
+		tb.ContextFlyout(cbf);
+		tb.SelectionFlyout(cbf);
+		TextBlock tbl;
+		tbl.Text(label);
+		xamlContainer.Children().Append(tbl);
+		xamlContainer.Children().Append(tb);
+	};
 
-	TextBox tb2;
-	mux::CommandBarFlyout winui2cbf;
-	tb2.ContextFlyout(winui2cbf);
-	tb2.SelectionFlyout(winui2cbf);
-	TextBlock tbl2;
-	tbl2.Text(L"TextBox with WinUI 2 CommandBarFlyout");
-	xamlContainer.Children().Append(tbl2);
-	xamlContainer.Children().Append(tb2);
+	appendTextBoxWithCbf(L"TextBox with OS XAML CommandBarFlyout (no crash on close if button is focused via keyboard)", TextCommandBarFlyout());
+	appendTextBoxWithCbf(L"TextBox with WinUI 2 CommandBarFlyout (crashes on close if button is focused via keyboard)", mux::TextCommandBarFlyout());
 
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);

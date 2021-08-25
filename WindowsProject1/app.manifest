@@ -8,11 +8,6 @@
 		</application>
 	</compatibility>
 	
-	<asmv3:application>
-		<asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
-			<dpiAwareness>PerMonitorV2</dpiAwareness>
-		</asmv3:windowsSettings>
-	</asmv3:application>
 	<file name="Microsoft.Toolkit.Win32.UI.XamlHost.dll" hashalg="SHA1">
 		<activatableClass name="Microsoft.Toolkit.Win32.UI.XamlHost.XamlApplication" threadingModel="both"
 		  xmlns="urn:schemas-microsoft-com:winrt.v1"></activatableClass>
