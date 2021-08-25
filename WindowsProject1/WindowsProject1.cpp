@@ -10,12 +10,22 @@
 #include <winrt/windows.ui.xaml.controls.primitives.h>
 #include <winrt/Windows.ui.xaml.media.h>
 
+
+#include <winrt/Microsoft.Toolkit.Win32.UI.XamlHost.h>
+#include <winrt/Microsoft.UI.Xaml.Controls.h>
+#include <winrt/Microsoft.UI.Xaml.XamlTypeInfo.h>
+
 using namespace winrt;
 using namespace Windows::UI;
 using namespace Windows::UI::Composition;
 using namespace Windows::UI::Xaml::Hosting;
+using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
 using namespace Windows::Foundation::Numerics;
+
+namespace mux {
+	using namespace Microsoft::UI::Xaml::Controls;
+}
 
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -67,8 +77,14 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	// The call to winrt::init_apartment initializes COM; by default, in a multithreaded apartment.
 	init_apartment(apartment_type::single_threaded);
 
+	auto winuiIXMP = winrt::Microsoft::UI::Xaml::XamlTypeInfo::XamlControlsXamlMetaDataProvider();
+
+	auto xapp = winrt::Microsoft::Toolkit::Win32::UI::XamlHost::XamlApplication({ winuiIXMP });
+
 	// Initialize the XAML framework's core window for the current thread.
 	WindowsXamlManager winxamlmanager = WindowsXamlManager::InitializeForCurrentThread();
+
+	xapp.Resources().MergedDictionaries().Append(winrt::Microsoft::UI::Xaml::Controls::XamlControlsResources());
 
 	// This DesktopWindowXamlSource is the object that enables a non-UWP desktop application 
 	// to host WinRT XAML controls in any UI element that is associated with a window handle (HWND).
@@ -87,13 +103,26 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	interop->get_WindowHandle(&hWndXamlIsland);
 
 	// Update the XAML Island window size because initially it is 0,0.
-	SetWindowPos(hWndXamlIsland, 0, 200, 100, 800, 200, SWP_SHOWWINDOW);
+	SetWindowPos(hWndXamlIsland, 0, 200, 100, 800, 300, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
-	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
+	StackPanel xamlContainer;
 
-	Windows::UI::Xaml::Controls::TextBox tb;
-	xamlContainer.Children().Append(tb);
+	TextBox tb1;
+	TextBlock tbl1;
+	tbl1.Text(L"TextBox");
+	xamlContainer.Children().Append(tbl1);
+	xamlContainer.Children().Append(tb1);
+
+	TextBox tb2;
+	mux::CommandBarFlyout winui2cbf;
+	tb2.ContextFlyout(winui2cbf);
+	tb2.SelectionFlyout(winui2cbf);
+	TextBlock tbl2;
+	tbl2.Text(L"TextBox with WinUI 2 CommandBarFlyout");
+	xamlContainer.Children().Append(tbl2);
+	xamlContainer.Children().Append(tb2);
+
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
 
