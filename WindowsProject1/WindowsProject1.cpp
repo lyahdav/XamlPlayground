@@ -258,6 +258,14 @@ bool FocusControl(
 	return false;
 }
 
+void addNButtonsToCbf(CommandBarFlyout cbf, int n) {
+	for (int i = 0; i < n; i++) {
+		AppBarButton btn;
+		btn.Label(L"btn");
+		cbf.SecondaryCommands().Append(btn);
+	}
+}
+
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 	_hInstance = hInstance;
@@ -328,27 +336,23 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	// Create the XAML content.
 	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
 
-	Button btn;
-	btn.Content(box_value(L"Open Flyout"));
-	btn.Click([=](auto&&...) {
-		auto cbf = winrt::make<CustomCbf>();
-		AppBarButton btn1;
-		btn1.Label(L"btn1");
+	auto makeButtonWithFlyout = [](auto title, auto cbfConstructor) {
+		Button btn;
+		btn.Content(box_value(title));
+		btn.Click([=](auto&&...) {
+			CommandBarFlyout cbf = cbfConstructor();
+			addNButtonsToCbf(cbf, 4);
+			cbf.ShowAt(btn);
+			});
+		return btn;
+	};
 
-		cbf.SecondaryCommands().Append(btn1);
-
-		auto addNButtonsToCbf = [](CommandBarFlyout cbf, int n) {
-			for (int i = 0; i < n; i++) {
-				AppBarButton btn;
-				btn.Label(L"btn");
-				cbf.SecondaryCommands().Append(btn);
-			}
-		};
-		addNButtonsToCbf(cbf, 3);
-		cbf.ShowAt(btn);
-		});
-
-	xamlContainer.Children().Append(btn);
+	xamlContainer.Children().Append(makeButtonWithFlyout(L"Open CommandBarFlyout", []() {
+		return CommandBarFlyout();
+		}));
+	xamlContainer.Children().Append(makeButtonWithFlyout(L"Open Custom CommandBarFlyout", []() {
+		return winrt::make<CustomCbf>();
+		}));
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
 
