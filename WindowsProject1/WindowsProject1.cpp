@@ -1,19 +1,4 @@
-#include <windows.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.system.h>
-#include <winrt/windows.ui.xaml.hosting.h>
-#include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
-#include <winrt/windows.ui.xaml.controls.h>
-#include <winrt/windows.ui.xaml.controls.primitives.h>
-#include <winrt/Windows.ui.xaml.media.h>
-
-
-#include <winrt/Microsoft.Toolkit.Win32.UI.XamlHost.h>
-#include <winrt/Microsoft.UI.Xaml.Controls.h>
-#include <winrt/Microsoft.UI.Xaml.XamlTypeInfo.h>
+#include "pch.h"
 
 using namespace winrt;
 using namespace Windows::UI;
@@ -37,7 +22,6 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 {
 	_hInstance = hInstance;
 
-	// The main window class name.
 	const wchar_t szWindowClass[] = L"Win32DesktopApp";
 	WNDCLASSEX windowClass = { };
 
@@ -156,21 +140,10 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT messageCode, WPARAM wParam, LPARAM lParam)
 {
-	PAINTSTRUCT ps;
-	HDC hdc;
-	wchar_t greeting[] = L"Hello World in Win32!";
 	RECT rcClient;
 
 	switch (messageCode)
 	{
-	case WM_PAINT:
-		if (hWnd == _hWnd)
-		{
-			//hdc = BeginPaint(hWnd, &ps);
-			//TextOut(hdc, 300, 5, greeting, wcslen(greeting));
-			//EndPaint(hWnd, &ps);
-		}
-		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
