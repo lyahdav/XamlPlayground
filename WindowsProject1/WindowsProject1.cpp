@@ -1,16 +1,6 @@
 #include "pch.h"
 
-using namespace winrt;
-using namespace Windows::UI;
-using namespace Windows::UI::Composition;
-using namespace Windows::UI::Xaml::Hosting;
-using namespace Windows::UI::Xaml::Controls;
-using namespace Windows::UI::Xaml::Controls::Primitives;
-using namespace Windows::Foundation::Numerics;
-
-namespace mux {
-	using namespace Microsoft::UI::Xaml::Controls;
-}
+#include "Shared.h"
 
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -92,32 +82,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	// Create the XAML content.
 	StackPanel xamlContainer;
 
-	auto appendTextBlock = [=](auto text, auto includeWorkaround) {
-		TextBlock tbl;
-		mux::TextCommandBarFlyout cbf;
-		if (includeWorkaround) {
-			cbf.Closed([=](auto&&...) {
-				mux::TextCommandBarFlyout newCbf;
-				tbl.SelectionFlyout(newCbf);
-				tbl.ContextFlyout(newCbf);
-				});
-		}
-		tbl.SelectionFlyout(cbf);
-		tbl.ContextFlyout(cbf);
-		tbl.Text(text);
-		tbl.IsTextSelectionEnabled(true);
-		xamlContainer.Children().Append(tbl);
-	};
-
-	appendTextBlock(L"TextBlock with bug", false);
-	appendTextBlock(L"TextBlock without bug", true);
-
-	TextBox tb;
-	tb.PlaceholderText(L"TextBox");
-	mux::TextCommandBarFlyout cbf2;
-	tb.SelectionFlyout(cbf2);
-	tb.ContextFlyout(cbf2);
-	xamlContainer.Children().Append(tb);
+	PopulateUI(xamlContainer);
 
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
