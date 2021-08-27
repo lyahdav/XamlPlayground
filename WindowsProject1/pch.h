@@ -3,19 +3,26 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unknwn.h>
+#include <restrictederrorinfo.h>
+#include <hstring.h>
 
+#include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.system.h>
-#include <winrt/windows.ui.xaml.controls.h>
-#include <winrt/windows.ui.xaml.controls.primitives.h>
+#include <winrt/Windows.UI.Xaml.h>
+#include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
+#include <winrt/Windows.UI.Xaml.Data.h>
+#include <winrt/Windows.UI.Xaml.Interop.h>
+#include <winrt/Windows.UI.Xaml.Markup.h>
+#include <winrt/Windows.UI.Xaml.Navigation.h>
 #include <winrt/Windows.ui.xaml.media.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/Windows.UI.Composition.h>
-#include <winrt/Windows.UI.Input.h>
+
+#include <winrt/Windows.ApplicationModel.Activation.h>
 
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
+#include <winrt/Microsoft.UI.Xaml.XamlTypeInfo.h>
 
 using namespace winrt;
 using namespace Windows::UI;

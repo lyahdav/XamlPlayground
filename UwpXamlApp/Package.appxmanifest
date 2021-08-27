@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
   <Identity
-    Name="1e2c4c69-4ea7-4206-a91a-529b6ccd049f"
+    Name="fba67524-1938-4dfd-86ba-083f59772dbe"
     Publisher="CN=lyahdav"
     Version="1.0.0.0" />
-  <mp:PhoneIdentity PhoneProductId="1e2c4c69-4ea7-4206-a91a-529b6ccd049f" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="fba67524-1938-4dfd-86ba-083f59772dbe" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
-    <DisplayName>UwpApp</DisplayName>
+    <DisplayName>UwpXamlApp</DisplayName>
     <PublisherDisplayName>lyahdav</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -17,9 +17,11 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="UwpApp.App">
-      <uap:VisualElements DisplayName="UwpApp" Description="A project for a C++/WinRT Universal Windows Platform (UWP) app directly implementing CoreApplication"
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="UwpXamlApp.App">
+      <uap:VisualElements DisplayName="UwpXamlApp" Description="Project for a single page C++/WinRT Universal Windows Platform (UWP) app with no predefined layout"
         Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+        </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
     </Application>
