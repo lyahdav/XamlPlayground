@@ -14,13 +14,13 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\WindowsProject1\pch.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\XamlIslandsApp\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\WindowsProject1\Shared.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\XamlIslandsApp\Shared.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\WindowsProject1\pch.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\WindowsProject1\Shared.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\XamlIslandsApp\pch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\XamlIslandsApp\Shared.h" />
   </ItemGroup>
 </Project>
