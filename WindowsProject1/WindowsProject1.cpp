@@ -13,7 +13,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_hInstance = hInstance;
 
 	const wchar_t szWindowClass[] = L"Win32DesktopApp";
-	WNDCLASSEX windowClass = { };
+	WNDCLASSEX windowClass = {};
 
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.lpfnWndProc = WindowProc;
