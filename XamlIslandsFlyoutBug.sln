@@ -13,6 +13,7 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SharedItems\SharedItems.vcxitems*{4d699d07-b6fb-4f9b-817b-070cd6ab1415}*SharedItemsImports = 4
 		SharedItems\SharedItems.vcxitems*{68c58e3f-2913-4ee9-ab24-153118cf4b3a}*SharedItemsImports = 9
+		SharedItems\SharedItems.vcxitems*{e20da119-eaea-4f3a-9d40-a7101ae3ea68}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM

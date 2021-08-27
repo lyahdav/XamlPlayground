@@ -1,6 +1,9 @@
 #include "pch.h"
 
+#include "WindowsProject1.h"
 #include "Shared.h"
+
+using namespace Windows::UI::Xaml::Hosting;
 
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 

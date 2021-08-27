@@ -14,9 +14,13 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\WindowsProject1\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\WindowsProject1\Shared.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\WindowsProject1\pch.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\WindowsProject1\Shared.h" />
   </ItemGroup>
 </Project>
