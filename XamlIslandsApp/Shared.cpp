@@ -24,9 +24,13 @@ void PopulateUI(StackPanel xamlContainer) {
 	appendTextBlock(L"TextBlock without bug", true);
 
 	TextBox tb;
-	tb.PlaceholderText(L"TextBox");
+	tb.PlaceholderText(L"TextBox with WinUI 2 TextCommandBarFlyout");
 	mux::TextCommandBarFlyout cbf2;
 	tb.SelectionFlyout(cbf2);
 	tb.ContextFlyout(cbf2);
 	xamlContainer.Children().Append(tb);
+
+	TextBox tb2;
+	tb2.PlaceholderText(L"TextBox with default TextCommandBarFlyout");
+	xamlContainer.Children().Append(tb2);
 }
