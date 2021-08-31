@@ -3,34 +3,33 @@
 #include "Shared.h"
 
 void PopulateUI(StackPanel xamlContainer) {
-	auto appendTextBlock = [=](auto text, auto includeWorkaround) {
-		TextBlock tbl;
-		mux::TextCommandBarFlyout cbf;
-		if (includeWorkaround) {
-			cbf.Closed([=](auto&&...) {
-				mux::TextCommandBarFlyout newCbf;
-				tbl.SelectionFlyout(newCbf);
-				tbl.ContextFlyout(newCbf);
-				});
-		}
-		tbl.SelectionFlyout(cbf);
-		tbl.ContextFlyout(cbf);
-		tbl.Text(text);
-		tbl.IsTextSelectionEnabled(true);
-		xamlContainer.Children().Append(tbl);
-	};
+	Grid spacer;
+	spacer.Height(300);
+	xamlContainer.Children().Append(spacer);
 
-	appendTextBlock(L"TextBlock with bug", false);
-	appendTextBlock(L"TextBlock without bug", true);
+	StackPanel bottomPanel;
+	bottomPanel.Orientation(Orientation::Horizontal);
+	xamlContainer.Children().Append(bottomPanel);
 
 	TextBox tb;
+	tb.Width(300);
 	tb.PlaceholderText(L"TextBox with WinUI 2 TextCommandBarFlyout");
 	mux::TextCommandBarFlyout cbf2;
 	tb.SelectionFlyout(cbf2);
 	tb.ContextFlyout(cbf2);
-	xamlContainer.Children().Append(tb);
+	bottomPanel.Children().Append(tb);
+
+	TextBox tb3;
+	tb3.Width(400);
+	tb3.PlaceholderText(L"TextBox with WinUI 2 TextCommandBarFlyout and Placement");
+	mux::TextCommandBarFlyout cbf3;
+	cbf3.Placement(FlyoutPlacementMode::BottomEdgeAlignedLeft);
+	tb3.SelectionFlyout(cbf3);
+	tb3.ContextFlyout(cbf3);
+	bottomPanel.Children().Append(tb3);
 
 	TextBox tb2;
+	tb2.Width(300);
 	tb2.PlaceholderText(L"TextBox with default TextCommandBarFlyout");
-	xamlContainer.Children().Append(tb2);
+	bottomPanel.Children().Append(tb2);
 }
