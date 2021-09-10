@@ -1,21 +1,9 @@
-#include <windows.h>
-#include <stdlib.h>
-#include <string.h>
+#include "pch.h"
 
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.system.h>
-#include <winrt/windows.ui.xaml.hosting.h>
-#include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
-#include <winrt/windows.ui.xaml.controls.h>
-#include <winrt/windows.ui.xaml.controls.primitives.h>
-#include <winrt/Windows.ui.xaml.media.h>
+#include "WindowsProject1.h"
+#include "Shared.h"
 
-using namespace winrt;
-using namespace Windows::UI;
-using namespace Windows::UI::Composition;
 using namespace Windows::UI::Xaml::Hosting;
-using namespace Windows::UI::Xaml::Controls::Primitives;
-using namespace Windows::Foundation::Numerics;
 
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -27,9 +15,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 {
 	_hInstance = hInstance;
 
-	// The main window class name.
 	const wchar_t szWindowClass[] = L"Win32DesktopApp";
-	WNDCLASSEX windowClass = { };
+	WNDCLASSEX windowClass = {};
 
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.lpfnWndProc = WindowProc;
@@ -67,8 +54,14 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	// The call to winrt::init_apartment initializes COM; by default, in a multithreaded apartment.
 	init_apartment(apartment_type::single_threaded);
 
+	auto winuiIXMP = winrt::Microsoft::UI::Xaml::XamlTypeInfo::XamlControlsXamlMetaDataProvider();
+
+	auto xapp = winrt::Microsoft::Toolkit::Win32::UI::XamlHost::XamlApplication({ winuiIXMP });
+
 	// Initialize the XAML framework's core window for the current thread.
 	WindowsXamlManager winxamlmanager = WindowsXamlManager::InitializeForCurrentThread();
+
+	xapp.Resources().MergedDictionaries().Append(winrt::Microsoft::UI::Xaml::Controls::XamlControlsResources());
 
 	// This DesktopWindowXamlSource is the object that enables a non-UWP desktop application 
 	// to host WinRT XAML controls in any UI element that is associated with a window handle (HWND).
@@ -87,42 +80,13 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	interop->get_WindowHandle(&hWndXamlIsland);
 
 	// Update the XAML Island window size because initially it is 0,0.
-	SetWindowPos(hWndXamlIsland, 0, 200, 100, 800, 200, SWP_SHOWWINDOW);
+	SetWindowPos(hWndXamlIsland, 0, 0, 0, 1200, 500, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
-	Windows::UI::Xaml::Controls::StackPanel xamlContainer;
-	xamlContainer.Background(Windows::UI::Xaml::Media::SolidColorBrush{ Windows::UI::Colors::LightGray() });
+	StackPanel xamlContainer;
 
-	Windows::UI::Xaml::Controls::TextBlock tb;
-	tb.Text(L"Hello World from Xaml Islands!");
-	tb.VerticalAlignment(Windows::UI::Xaml::VerticalAlignment::Center);
-	tb.HorizontalAlignment(Windows::UI::Xaml::HorizontalAlignment::Center);
-	tb.FontSize(48);
+	PopulateUI(xamlContainer);
 
-	Windows::UI::Xaml::Controls::Flyout f;
-	Windows::UI::Xaml::Controls::Flyout f2;
-	Windows::UI::Xaml::Controls::Button b;
-	Windows::UI::Xaml::Controls::Button b2;
-
-	//f.XamlRoot(xamlContainer.XamlRoot()); // This doesn't seem to make a difference
-	f.ShouldConstrainToRootBounds(false);
-	f2.ShouldConstrainToRootBounds(true); // This doesn't seem to make a difference
-	b.Content(winrt::box_value(L"Hi"));
-	b.Click([=](auto, auto) {
-		f.ShowAt(b);
-	});
-
-	b2.Content(winrt::box_value(L"Hi"));
-	b2.Click([=](auto, auto) {
-		//f2.Target(b2);// XamlRoot(b2.XamlRoot());
-		//FlyoutShowOptions options;
-		//options.ShowMode(FlyoutShowMode::Transient);
-		f2.ShowAt(b2/*, options*/);
-	});
-	f.Content(b2);
-
-	xamlContainer.Children().Append(tb);
-	xamlContainer.Children().Append(b);
 	xamlContainer.UpdateLayout();
 	desktopSource.Content(xamlContainer);
 
@@ -144,21 +108,10 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT messageCode, WPARAM wParam, LPARAM lParam)
 {
-	PAINTSTRUCT ps;
-	HDC hdc;
-	wchar_t greeting[] = L"Hello World in Win32!";
 	RECT rcClient;
 
 	switch (messageCode)
 	{
-	case WM_PAINT:
-		if (hWnd == _hWnd)
-		{
-			hdc = BeginPaint(hWnd, &ps);
-			TextOut(hdc, 300, 5, greeting, wcslen(greeting));
-			EndPaint(hWnd, &ps);
-		}
-		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
