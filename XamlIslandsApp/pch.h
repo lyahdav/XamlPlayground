@@ -27,9 +27,13 @@
 using namespace winrt;
 using namespace Windows::UI;
 using namespace Windows::UI::Composition;
+using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Controls::Primitives;
+using namespace Windows::UI::Xaml::Media;
 using namespace Windows::Foundation::Numerics;
+
+namespace xaml = Windows::UI::Xaml;
 
 namespace mux {
 	using namespace Microsoft::UI::Xaml::Controls;
