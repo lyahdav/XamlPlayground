@@ -20,21 +20,17 @@ void PopulateUI(StackPanel xamlContainer) {
   sv.VerticalScrollBarVisibility(ScrollBarVisibility::Hidden);
   xamlContainer.Children().Append(buttonWithText());
 
-  StackPanel svsp;
-  svsp.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
-
   StackPanel fz;
   fz.Background(SolidColorBrush(Windows::UI::Colors::Red()));
   fz.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
   fz.XYFocusKeyboardNavigation(xaml::Input::XYFocusKeyboardNavigationMode::Enabled);
-  fz.Children().Append(sv);
 
-  svsp.Children().Append(buttonWithText(L"Btn1"));
-  svsp.Children().Append(buttonWithText(L"Btn2"));
-  svsp.Children().Append(tb);
+  fz.Children().Append(buttonWithText(L"Btn1"));
+  fz.Children().Append(buttonWithText(L"Btn2"));
+  fz.Children().Append(tb);
 
-  sv.Content(svsp);
-  xamlContainer.Children().Append(fz);
+  sv.Content(fz);
+  xamlContainer.Children().Append(sv);
 
   xamlContainer.Children().Append(buttonWithText());
 }
