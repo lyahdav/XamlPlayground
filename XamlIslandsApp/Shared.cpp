@@ -11,6 +11,11 @@ void PopulateUI(StackPanel xamlContainer) {
   };
   
   ScrollViewer sv;
+  ScrollViewer svi;
+  StackPanel svisp;
+  svi.Content(svisp);
+  svi.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
+
   sv.Background(SolidColorBrush(Windows::UI::Colors::Blue()));
   sv.Height(100);
   sv.Width(100);
@@ -33,8 +38,10 @@ void PopulateUI(StackPanel xamlContainer) {
   fz.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
   fz.XYFocusKeyboardNavigation(xaml::Input::XYFocusKeyboardNavigationMode::Enabled);
 
-  fz.Children().Append(buttonWithText(L"Btn"));
-  fz.Children().Append(buttonWithText(L"Btn"));
+  fz.Children().Append(svi);
+
+  svisp.Children().Append(buttonWithText(L"Btn"));
+  svisp.Children().Append(buttonWithText(L"Btn"));
 
   sv.Content(fz);
   xamlContainer.Children().Append(sv);
