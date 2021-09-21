@@ -5,37 +5,39 @@
 void PopulateUI(StackPanel xamlContainer) {
   auto buttonWithText = [=](hstring text = L"Button") {
     Button btn;
+    btn.Width(50);
     btn.Content(winrt::box_value(text));
     return btn;
   };
   
   ScrollViewer sv;
-  TextBlock tb;
+  sv.Background(SolidColorBrush(Windows::UI::Colors::Blue()));
+  sv.Height(100);
+  sv.Width(100);
   StackPanel fz;
-  StackPanel fzc;
-  fzc.SizeChanged([=](auto&&...) {
-    sv.Height(fzc.ActualHeight());
+  fz.Orientation(Orientation::Horizontal);
+
+  sv.SizeChanged([fz](auto sender, auto&&...) {
+    auto senderAsScrollViewer = sender.as<ScrollViewer>();
+    fz.Width(senderAsScrollViewer.ActualWidth() + 1);
+    fz.Height(senderAsScrollViewer.ActualHeight() + 1);
     });
 
   sv.VerticalScrollMode(ScrollMode::Disabled);
   sv.VerticalScrollBarVisibility(ScrollBarVisibility::Hidden);
+  sv.HorizontalScrollMode(ScrollMode::Disabled);
+  sv.HorizontalScrollBarVisibility(ScrollBarVisibility::Hidden);
   xamlContainer.Children().Append(buttonWithText());
 
   fz.Background(SolidColorBrush(Windows::UI::Colors::Red()));
   fz.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
   fz.XYFocusKeyboardNavigation(xaml::Input::XYFocusKeyboardNavigationMode::Enabled);
 
-  fzc.Children().Append(buttonWithText(L"Btn1"));
-  fzc.Children().Append(buttonWithText(L"Btn2"));
-  fz.Children().Append(fzc);
-  fz.Children().Append(tb);
+  fz.Children().Append(buttonWithText(L"Btn"));
+  fz.Children().Append(buttonWithText(L"Btn"));
 
   sv.Content(fz);
   xamlContainer.Children().Append(sv);
 
-  auto btn = buttonWithText(L"Add btn to fz");
-  btn.Click([=](auto&&...) {
-    fzc.Children().Append(buttonWithText());
-    });
-  xamlContainer.Children().Append(btn);
+  xamlContainer.Children().Append(buttonWithText());
 }
