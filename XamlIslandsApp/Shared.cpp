@@ -2,49 +2,35 @@
 
 #include "Shared.h"
 
-void PopulateUI(StackPanel xamlContainer) {
-  auto buttonWithText = [=](hstring text = L"Button") {
-    Button btn;
-    btn.Width(50);
-    btn.Content(winrt::box_value(text));
-    return btn;
-  };
-  
+Button buttonWithText(hstring text = L"Button") {
+  Button btn;
+  btn.Content(winrt::box_value(text));
+  return btn;
+}
+
+StackPanel stackPanelWithBug(bool useWorkaround) {
+  StackPanel sp;
+  StackPanel svsp;
+  if (useWorkaround) {
+    svsp.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
+  }
   ScrollViewer sv;
-  ScrollViewer svi;
-  StackPanel svisp;
-  svi.Content(svisp);
-  svi.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
+  sp.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
+  TextBlock tb;
+  tb.Text(useWorkaround ? L"with workaround" : L"without workaround");
+  sp.Children().Append(tb);
+  sp.Children().Append(sv);
+  sv.Content(svsp);
+  svsp.Children().Append(buttonWithText(L"Button inside TabFocusNavigation=Once StackPanel"));
+  svsp.Children().Append(buttonWithText(L"Button inside TabFocusNavigation=Once StackPanel"));
+  return sp;
+}
 
-  sv.Background(SolidColorBrush(Windows::UI::Colors::Blue()));
-  sv.Height(100);
-  sv.Width(100);
-  StackPanel fz;
-  fz.Orientation(Orientation::Horizontal);
+void PopulateUI(StackPanel xamlContainer) {
+  xamlContainer.Children().Append(buttonWithText(L"Button outside TabFocusNavigation=Once StackPanel"));
 
-  sv.SizeChanged([fz](auto sender, auto&&...) {
-    auto senderAsScrollViewer = sender.as<ScrollViewer>();
-    fz.Width(senderAsScrollViewer.ActualWidth() + 1);
-    fz.Height(senderAsScrollViewer.ActualHeight() + 1);
-    });
+  xamlContainer.Children().Append(stackPanelWithBug(false));
+  xamlContainer.Children().Append(stackPanelWithBug(true));
 
-  sv.VerticalScrollMode(ScrollMode::Disabled);
-  sv.VerticalScrollBarVisibility(ScrollBarVisibility::Hidden);
-  sv.HorizontalScrollMode(ScrollMode::Disabled);
-  sv.HorizontalScrollBarVisibility(ScrollBarVisibility::Hidden);
-  xamlContainer.Children().Append(buttonWithText());
-
-  fz.Background(SolidColorBrush(Windows::UI::Colors::Red()));
-  fz.TabFocusNavigation(xaml::Input::KeyboardNavigationMode::Once);
-  fz.XYFocusKeyboardNavigation(xaml::Input::XYFocusKeyboardNavigationMode::Enabled);
-
-  fz.Children().Append(svi);
-
-  svisp.Children().Append(buttonWithText(L"Btn"));
-  svisp.Children().Append(buttonWithText(L"Btn"));
-
-  sv.Content(fz);
-  xamlContainer.Children().Append(sv);
-
-  xamlContainer.Children().Append(buttonWithText());
+  xamlContainer.Children().Append(buttonWithText(L"Button outside TabFocusNavigation=Once StackPanel"));
 }
