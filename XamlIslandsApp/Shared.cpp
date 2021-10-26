@@ -14,6 +14,7 @@ void PopulateUI(StackPanel xamlContainer) {
   sv.Background(SolidColorBrush(Windows::UI::Colors::Blue()));
   sv.Height(100);
   sv.Width(100);
+
   StackPanel fz;
   fz.Orientation(Orientation::Horizontal);
 
@@ -27,6 +28,7 @@ void PopulateUI(StackPanel xamlContainer) {
   sv.VerticalScrollBarVisibility(ScrollBarVisibility::Hidden);
   sv.HorizontalScrollMode(ScrollMode::Disabled);
   sv.HorizontalScrollBarVisibility(ScrollBarVisibility::Hidden);
+  sv.BringIntoViewOnFocusChange(false);
   xamlContainer.Children().Append(buttonWithText());
 
   fz.Background(SolidColorBrush(Windows::UI::Colors::Red()));
