@@ -67,7 +67,6 @@ void FixCbfKbNav(XamlRoot xamlRoot) {
     return;
   }
 
-  scrollViewer.Width(scrollViewer.ActualWidth());
   scrollViewer.Height(scrollViewer.ActualHeight());
 
   scrollViewer.VerticalScrollMode(ScrollMode::Disabled);
@@ -77,17 +76,23 @@ void FixCbfKbNav(XamlRoot xamlRoot) {
   scrollViewer.BringIntoViewOnFocusChange(false);
 
   auto content = scrollViewer.Content().as<FrameworkElement>();
-  content.Width(scrollViewer.ActualWidth() + 1);
   content.Height(scrollViewer.ActualHeight() + 1);
 }
 
 void PopulateUI(StackPanel xamlContainer) {
-  auto abb = [=](hstring text = L"Btn") {
+  auto abb = [=](bool includeSubmenu = false, hstring text = L"Btn") {
     AppBarButton abb;
     abb.Label(text);
     abb.Click([](auto &&...) {
       OutputDebugString(L"Click");
       });
+    if (includeSubmenu) {
+      MenuFlyout menuFlyout;
+      MenuFlyoutItem mi;
+      mi.Text(L"Menu item");
+      menuFlyout.Items().Append(mi);
+      abb.Flyout(menuFlyout);
+    }
     return abb;
   };
 
@@ -130,7 +135,7 @@ void PopulateUI(StackPanel xamlContainer) {
 
   xamlContainer.Children().Append(buttonWithTextAndClick(L"CBF without fix", [abb](auto btn) {
     CommandBarFlyout cbf;
-    cbf.SecondaryCommands().Append(abb());
+    cbf.SecondaryCommands().Append(abb(true));
     cbf.SecondaryCommands().Append(abb());
     cbf.SecondaryCommands().Append(abb());
     cbf.SecondaryCommands().Append(abb());
@@ -139,6 +144,7 @@ void PopulateUI(StackPanel xamlContainer) {
 
   xamlContainer.Children().Append(buttonWithTextAndClick(L"CBF without fix long", [abb](auto btn) {
     CommandBarFlyout cbf;
+    cbf.SecondaryCommands().Append(abb(true));
     for (int i = 0; i < 20; i++) {
       cbf.SecondaryCommands().Append(abb());
     }
@@ -147,7 +153,7 @@ void PopulateUI(StackPanel xamlContainer) {
 
   xamlContainer.Children().Append(buttonWithTextAndClick(L"CBF with fix", [abb](auto btn) {
     CommandBarFlyout cbf;
-    auto btn1 = abb();
+    auto btn1 = abb(true);
     btn1.Loaded([](auto &sender, auto &&...) {
       FixCbfKbNav(sender.as<AppBarButton>().XamlRoot());
     });
@@ -160,7 +166,7 @@ void PopulateUI(StackPanel xamlContainer) {
 
   xamlContainer.Children().Append(buttonWithTextAndClick(L"CBF with fix long", [abb](auto btn) {
     CommandBarFlyout cbf;
-    auto btn1 = abb();
+    auto btn1 = abb(true);
     btn1.Loaded([](auto& sender, auto &&...) {
       FixCbfKbNav(sender.as<AppBarButton>().XamlRoot());
     });
