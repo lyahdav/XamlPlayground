@@ -4,7 +4,20 @@
 
 static int gCounter = 0;
 
-Button CreateButton(ScrollViewer sv) {
+namespace win {
+  using namespace Xaml;
+  using namespace Xaml::Media;
+  using namespace Controls;
+}
+
+void PrintRect(winrt::Windows::Foundation::Rect rect, std::wstring rectName) noexcept {
+  std::wostringstream wostringstream;
+  wostringstream << rectName << L": X=" << rect.X << L", Y=" << rect.Y << L", W=" << rect.Width
+    << L", H=" << rect.Height << std::endl;
+  OutputDebugString(wostringstream.str().c_str());
+}
+
+Button CreateButton(bool logEffectiveViewportChanged = false) {
   std::string content = "Button ";
   content += std::to_string(++gCounter);
 
@@ -12,22 +25,13 @@ Button CreateButton(ScrollViewer sv) {
   btn.Content(box_value(to_hstring(content)));
   btn.Height(45);
 
-  btn.EffectiveViewportChanged([sv](FrameworkElement sender, EffectiveViewportChangedEventArgs args) {
-    auto btnInner = sender.as<Button>();
-    auto btnHeight = sender.ActualHeight();
-    auto btnContent = unbox_value<hstring>(btnInner.Content());
-    auto effectiveViewport = args.EffectiveViewport();
-    std::wostringstream wostringstream;
-    wostringstream << L"X=" << effectiveViewport.X << L", Y=" << effectiveViewport.Y << L", W=" << effectiveViewport.Width << L", H=" << effectiveViewport.Height;
-    auto rectStr = wostringstream.str();
-    auto BringIntoViewDistanceX = args.BringIntoViewDistanceX();
-    auto BringIntoViewDistanceY = args.BringIntoViewDistanceY(); // In Islands this is abs value of how much to move element down to bring to top of ScrollViewer
-    auto effectiveViewportY = effectiveViewport.Y; // In Islands this is how much to move element down to bring to top of ScrollViewer
-    auto scrollViewerHeight = sv.ActualHeight();
-    auto inViewportIslands = effectiveViewportY > 0 ? effectiveViewportY < btnHeight : -effectiveViewportY < scrollViewerHeight;
-    auto inViewportUwp = args.BringIntoViewDistanceY() < btnHeight;
-    OutputDebugString(L""); // {btnContent} EffectiveViewportChanged, inViewportIslands={inViewportIslands}, rectStr={rectStr}
-    });
+  if (logEffectiveViewportChanged) {
+    btn.EffectiveViewportChanged([](FrameworkElement sender, EffectiveViewportChangedEventArgs args) {
+      PrintRect(RectHelper::FromCoordinatesAndDimensions(args.BringIntoViewDistanceX(), args.BringIntoViewDistanceY(), 0, 0), L"BringIntoViewDistance");
+      PrintRect(args.EffectiveViewport(), L"EffectiveViewport");
+      PrintRect(args.MaxViewport(), L"MaxViewport");
+      });
+  }
 
   return btn;
 }
@@ -39,9 +43,12 @@ void PopulateUI(StackPanel xamlContainer) {
 
   sv.Content(sp);
 
-  sp.Children().Append(CreateButton(sv));
-  sp.Children().Append(CreateButton(sv));
-  sp.Children().Append(CreateButton(sv));
-  sp.Children().Append(CreateButton(sv));
+  sp.Children().Append(CreateButton());
+  sp.Children().Append(CreateButton());
+  sp.Children().Append(CreateButton());
+  sp.Children().Append(CreateButton(true));
+  sp.Children().Append(CreateButton());
+  sp.Children().Append(CreateButton());
+  sp.Children().Append(CreateButton());
   xamlContainer.Children().Append(sv);
 }
