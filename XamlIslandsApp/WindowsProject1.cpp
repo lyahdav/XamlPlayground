@@ -35,7 +35,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_hWnd = CreateWindow(
 		szWindowClass,
 		L"Windows c++ Win32 Desktop App",
-		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+		WS_POPUP | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_VISIBLE,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL,
 		NULL,
@@ -47,6 +47,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		MessageBox(NULL, L"Call to CreateWindow failed!", L"Error", NULL);
 		return 0;
 	}
+	SetWindowPos(_hWnd, 0, 0, 0, 1200, 500, SWP_SHOWWINDOW);
 
 
 	// Begin XAML Island section.
