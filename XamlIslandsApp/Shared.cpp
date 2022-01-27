@@ -18,8 +18,8 @@ void PopulateUI(StackPanel xamlContainer) {
     messageTextBlock.TextWrapping(Xaml::TextWrapping::Wrap);
     dlg.Title(titleTextBlock);
     dlg.Content(messageTextBlock);
-    dlg.PrimaryButtonText(L"Primary Button");
-    dlg.SecondaryButtonText(L"Secondary Button");
+    dlg.PrimaryButtonText(L"Primary");
+    dlg.SecondaryButtonText(L"Secondary");
     dlg.CloseButtonText(L"OK");
 
     dlg.XamlRoot(xamlContainer.XamlRoot());
