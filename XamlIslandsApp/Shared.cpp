@@ -22,13 +22,9 @@ void PopulateUI(StackPanel xamlContainer) {
     dlg.SecondaryButtonText(L"Secondary Button");
     dlg.CloseButtonText(L"OK");
 
-    //ContentDialog dlg;
-    //dlg.Title(winrt::box_value(L"Title"));
-    //dlg.Content(winrt::box_value(L"Content"));
-    //dlg.CloseButtonText(L"OK");
-
     dlg.XamlRoot(xamlContainer.XamlRoot());
     dlg.ShowAsync();
     });
   xamlContainer.Children().Append(btn);
+  xamlContainer.Children().Append(TextBox());
 }

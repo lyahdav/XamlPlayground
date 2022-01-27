@@ -35,7 +35,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_hWnd = CreateWindow(
 		szWindowClass,
 		L"Windows c++ Win32 Desktop App",
-		WS_POPUP | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_VISIBLE,
+		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 		NULL,
 		NULL,
@@ -119,7 +119,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT messageCode, WPARAM wParam, LPARAM l
 
 		// Create main window
 	case WM_CREATE:
-		_childhWnd = CreateWindowEx(0, L"ChildWClass", NULL, WS_POPUP, 0, 0, 0, 0, hWnd, NULL, _hInstance, NULL);
+		_childhWnd = CreateWindowEx(0, L"ChildWClass", NULL, WS_CHILD | WS_BORDER, 0, 0, 0, 0, hWnd, NULL, _hInstance, NULL);
 		return 0;
 
 		// Main window changed size
