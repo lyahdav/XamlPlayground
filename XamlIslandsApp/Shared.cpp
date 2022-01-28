@@ -26,5 +26,10 @@ void PopulateUI(StackPanel xamlContainer) {
     dlg.ShowAsync();
     });
   xamlContainer.Children().Append(btn);
-  xamlContainer.Children().Append(TextBox());
+
+  TextBox tb;
+  mux::TextCommandBarFlyout cbf;
+  tb.SelectionFlyout(cbf);
+  tb.ContextFlyout(cbf);
+  xamlContainer.Children().Append(tb);
 }
