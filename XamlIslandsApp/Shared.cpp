@@ -3,6 +3,13 @@
 #include "Shared.h"
 
 void PopulateUI(StackPanel xamlContainer) {
+  xamlContainer.HorizontalAlignment(HorizontalAlignment::Left);
+
+  TextBox tb;
+  tb.AcceptsReturn(true);
+  tb.PlaceholderText(L"Placeholder");
+  tb.Width(200);
+
   Button btn;
   btn.Content(winrt::box_value(L"Button"));
   btn.Click([=](auto&&...) {
@@ -12,5 +19,7 @@ void PopulateUI(StackPanel xamlContainer) {
     dlg.XamlRoot(xamlContainer.XamlRoot());
     dlg.ShowAsync();
     });
+
+  xamlContainer.Children().Append(tb);
   xamlContainer.Children().Append(btn);
 }
