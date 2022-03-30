@@ -6,7 +6,6 @@ void PopulateUI(StackPanel xamlContainer) {
   xamlContainer.HorizontalAlignment(HorizontalAlignment::Left);
 
   TextBox tb;
-  tb.AcceptsReturn(true);
   tb.PlaceholderText(L"Placeholder");
   tb.Width(200);
 
