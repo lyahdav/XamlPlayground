@@ -80,7 +80,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	interop->get_WindowHandle(&hWndXamlIsland);
 
 	// Update the XAML Island window size because initially it is 0,0.
-	SetWindowPos(hWndXamlIsland, 0, 0, 0, 1200, 500, SWP_SHOWWINDOW);
+	SetWindowPos(hWndXamlIsland, 0, 0, 0, 1276, 709, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
 	StackPanel xamlContainer;
