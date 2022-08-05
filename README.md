@@ -2,7 +2,7 @@
 
 Simple app for using XAML in both a UWP and XAML Islands setup.
 
-# Prerequisits
+# Prerequisites
 
 - Install Visual Studio 2022 including packages:
   - Desktop development with C++
