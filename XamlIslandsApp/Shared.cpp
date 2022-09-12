@@ -2,23 +2,24 @@
 
 #include "Shared.h"
 
+void AddComboBoxItem(ComboBox cmb, hstring label) {
+  auto comboBoxItem = ComboBoxItem();
+  comboBoxItem.Content(box_value(label));
+  cmb.Items().Append(comboBoxItem);
+}
+
 void PopulateUI(StackPanel xamlContainer) {
   xamlContainer.HorizontalAlignment(HorizontalAlignment::Left);
+  xamlContainer.VerticalAlignment(VerticalAlignment::Bottom);
 
-  TextBox tb;
-  tb.PlaceholderText(L"Placeholder");
-  tb.Width(200);
+  ComboBox cmb;
 
-  Button btn;
-  btn.Content(winrt::box_value(L"Button"));
-  btn.Click([=](auto&&...) {
-    ContentDialog dlg;
-    dlg.Content(winrt::box_value(L"Content"));
-    dlg.CloseButtonText(L"OK");
-    dlg.XamlRoot(xamlContainer.XamlRoot());
-    dlg.ShowAsync();
-    });
+  for (int i = 1; i <= 10; i++)
+  {
+    AddComboBoxItem(cmb, L"Item " + to_hstring(i));
+  }
+  AddComboBoxItem(cmb, L"Last Item");
+  cmb.SelectedIndex(0);
 
-  xamlContainer.Children().Append(tb);
-  xamlContainer.Children().Append(btn);
+  xamlContainer.Children().Append(cmb);
 }
