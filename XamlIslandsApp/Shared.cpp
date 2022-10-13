@@ -2,7 +2,13 @@
 
 #include "Shared.h"
 
+#include "winrt/Windows.UI.Xaml.Documents.h"
+
+using namespace Documents;
+
 void PopulateUI(StackPanel xamlContainer) {
+	Paragraph p;
+
   xamlContainer.HorizontalAlignment(HorizontalAlignment::Left);
 
   TextBox tb;
