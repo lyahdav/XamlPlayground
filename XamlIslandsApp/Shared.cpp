@@ -5,20 +5,21 @@
 void PopulateUI(StackPanel xamlContainer) {
   xamlContainer.HorizontalAlignment(HorizontalAlignment::Left);
 
-  TextBox tb;
-  tb.PlaceholderText(L"Placeholder");
-  tb.Width(200);
-
   Button btn;
-  btn.Content(winrt::box_value(L"Button"));
+  btn.Content(box_value(L"Show CommandBarFlyout"));
   btn.Click([=](auto&&...) {
-    ContentDialog dlg;
-    dlg.Content(winrt::box_value(L"Content"));
-    dlg.CloseButtonText(L"OK");
-    dlg.XamlRoot(xamlContainer.XamlRoot());
-    dlg.ShowAsync();
+		mux::CommandBarFlyout cbf;
+
+		AppBarButton abb;
+		abb.Label(L"Button 1");
+		cbf.SecondaryCommands().Append(abb);
+
+		AppBarButton abb2;
+		abb2.Label(L"Button 2");
+		cbf.SecondaryCommands().Append(abb2);
+
+		cbf.ShowAt(btn);
     });
 
-  xamlContainer.Children().Append(tb);
   xamlContainer.Children().Append(btn);
 }
