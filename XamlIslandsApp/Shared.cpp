@@ -5,19 +5,33 @@
 void PopulateUI(StackPanel xamlContainer) {
   xamlContainer.HorizontalAlignment(HorizontalAlignment::Left);
 
-  Button btn;
-  btn.Content(box_value(L"Show CommandBarFlyout"));
-  btn.Click([=](auto&&...) {
-		mux::CommandBarFlyout cbf;
+	mux::CommandBarFlyout cbf;
 
+	const auto addAppBarButton = [&]() {
 		AppBarButton abb;
-		abb.Label(L"Button 1");
+		abb.Label(L"Button");
 		cbf.SecondaryCommands().Append(abb);
+	};
 
-		AppBarButton abb2;
-		abb2.Label(L"Button 2");
-		cbf.SecondaryCommands().Append(abb2);
+	const auto addSeparator = [&]() {
+		AppBarSeparator separator;
+		cbf.SecondaryCommands().Append(separator);
+	};
+	
+	addAppBarButton();
+	addSeparator();
+	addAppBarButton();
+	addAppBarButton();
+	addSeparator();
+	addAppBarButton();
+	addAppBarButton();
+	addSeparator();
+	addAppBarButton();
+	addAppBarButton();
 
+	Button btn;
+	btn.Content(box_value(L"Show CommandBarFlyout"));
+	btn.Click([=](auto&&...) {
 		cbf.ShowAt(btn);
     });
 
