@@ -28,24 +28,34 @@ void PopulateUI(StackPanel xamlContainer) {
   p.Children().Append(p2);
   p.Children().Append(btn2);
 
-  Flyout flyout;
-  flyout.ShouldConstrainToRootBounds(false);
-  flyout.Content(p);
-
-  Flyout flyout2;
-  flyout2.ShouldConstrainToRootBounds(true);
-  flyout2.Content(p);
-
   Button btnFlyout;
   btnFlyout.Content(winrt::box_value(L"Open Flyout: ShouldConstrainToRootBounds=false"));
   btnFlyout.Click([=](auto&&...) {
-    flyout.ShowAt(btnFlyout);
+		Flyout flyout;
+		flyout.ShouldConstrainToRootBounds(false);
+		flyout.Content(p);
+
+		flyout.ShowAt(btnFlyout);
     });
 
   Button btnFlyout2;
   btnFlyout2.Content(winrt::box_value(L"Open Flyout: ShouldConstrainToRootBounds=true"));
   btnFlyout2.Click([=](auto&&...) {
-    flyout2.ShowAt(btnFlyout2);
+		StackPanel p3;
+
+		Button btn3;
+		btn3.Content(winrt::box_value(L"Button3"));
+		Button btn4;
+		btn4.Content(winrt::box_value(L"Button4"));
+
+		p3.Children().Append(btn3);
+		p3.Children().Append(btn4);
+
+		Flyout flyout2;
+		flyout2.ShouldConstrainToRootBounds(true);
+		flyout2.Content(p3);
+		
+		flyout2.ShowAt(btnFlyout2);
     });
 
   xamlContainer.Children().Append(btnFlyout);
