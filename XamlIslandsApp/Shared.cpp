@@ -5,10 +5,6 @@
 void PopulateUI(StackPanel xamlContainer) {
   xamlContainer.HorizontalAlignment(HorizontalAlignment::Left);
 
-  TextBox tb;
-  tb.PlaceholderText(L"Placeholder");
-  tb.Width(200);
-
   Button btn;
   btn.Content(winrt::box_value(L"Button"));
   btn.Click([=](auto&&...) {
@@ -19,6 +15,18 @@ void PopulateUI(StackPanel xamlContainer) {
     dlg.ShowAsync();
     });
 
-  xamlContainer.Children().Append(tb);
+	Button btn2;
+	btn2.Content(winrt::box_value(L"Button2"));
+	Button btn3;
+	btn3.Content(winrt::box_value(L"Button3"));
+	
+	StackPanel sp;
+	sp.Children().Append(btn2);
+	sp.Children().Append(btn3);
+
+	ScrollViewer sv;
+	sv.Content(sp);
+
   xamlContainer.Children().Append(btn);
+	xamlContainer.Children().Append(sv);
 }
