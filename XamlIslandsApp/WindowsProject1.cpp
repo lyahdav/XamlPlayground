@@ -80,7 +80,7 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	interop->get_WindowHandle(&hWndXamlIsland);
 
 	// Update the XAML Island window size because initially it is 0,0.
-	SetWindowPos(hWndXamlIsland, 0, 0, 0, 1200, 500, SWP_SHOWWINDOW);
+	SetWindowPos(hWndXamlIsland, 0, 0, 0, 1920, 1080, SWP_SHOWWINDOW);
 
 	// Create the XAML content.
 	StackPanel xamlContainer;
@@ -127,7 +127,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT messageCode, WPARAM wParam, LPARAM l
 		// area, and enumerate the child windows. Pass the
 		// dimensions to the child windows during enumeration.
 		GetClientRect(hWnd, &rcClient);
-		MoveWindow(_childhWnd, 200, 200, 400, 500, TRUE);
+		MoveWindow(_childhWnd, 200, 200, 1920, 1080, TRUE);
 		ShowWindow(_childhWnd, SW_SHOW);
 
 		return 0;
